@@ -8,6 +8,7 @@
     <arg name="world_init_x"       default="0.0" /> <!-- X Initial position of the robot in Gazebo World -->
     <arg name="world_init_y"       default="0.0" /> <!-- Y Initial position of the robot in Gazebo World -->
     <arg name="world_init_heading" default="0.0" /> <!-- Initial heading of the robot in Gazebo World -->
+    <arg name="enable_contact_sensor" default="false" />
 
     <param name="use_sim_time" value="true" />
 
@@ -31,5 +32,6 @@
         <arg name="world_init_y"       value="$(arg world_init_y)" />
         <arg name="world_init_heading" value="$(arg world_init_heading)" />
         <arg name="gui"                value="$(arg gui)" />
+        <arg name="enable_contact_sensor" value="$(arg enable_contact_sensor)" />
     </include>    
 </launch>

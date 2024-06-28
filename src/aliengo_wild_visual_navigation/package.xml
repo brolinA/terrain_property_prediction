@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>aliengo_wild_visual_navigation</name>
+  <version>0.0.1</version>
+  <description>Unitree Aliengo simulation environment for wild_visual_navigation</description>
+  <maintainer email="jonfrey@ethz.ch">Jonas Frey</maintainer>
+
+  <license>Proprietary</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <depend>rospy</depend>
+  <depend>nav_msgs</depend>
+  <depend>sensor_msgs</depend>
+  <depend>std_msgs</depend>
+  <depend>wild_visual_navigation_ros</depend>
+
+  <exec_depend>gazebo_ros</exec_depend>
+  <export>
+    <gazebo_ros gazebo_media_path="${prefix}"/>
+    <gazebo_ros gazebo_model_path="${prefix}/models"/>
+  </export>
+</package>

@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<launch>
+
+    <arg name="robot_name" default="/"/>
+    <arg name="rviz" default="true"/>
+    <arg name="gazebo_world" default="$(find aliengo_wild_visual_navigation)/worlds/outdoor.world" /> <!-- Path to Gazebo world you want to load. -->
+    <arg name="world_init_x" default="0.0" /> <!-- X Initial position of the robot in Gazebo World -->
+    <arg name="world_init_y" default="5.0" /> <!-- Y Initial position of the robot in Gazebo World -->
+    
+    <!-- Spawn robot in gazebo -->
+    <include file="$(find aliengo_config)/launch/gazebo.launch">
+        <arg name="gazebo_world"       value="$(arg gazebo_world)"/>
+        <arg name="world_init_x"       value="$(arg world_init_x)" />
+        <arg name="world_init_y"       value="$(arg world_init_y)" />
+    </include>
+
+    <!-- publish world in rviz for visualization -->
+    <node name="gazebo_world_publisher" pkg="aliengo_wild_visual_navigation" type="gazebo_world_publisher.py" output="screen">
+        <param name="world_frame_id" value="world"/>
+        <param name="base_frame_id" value="base"/>
+    </node>
+
+    <!-- rviz -->
+    <node if="$(arg rviz)" name="rviz" pkg="rviz" type="rviz"
+            args="-d $(find aliengo_wild_visual_navigation)/rviz/rviz_visualization.rviz"
+            output="screen"/>
+
+</launch>
