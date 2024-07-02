@@ -1,0 +1,16 @@
+<launch>
+    <!-- Arguments -->
+    <arg name="camera_file"       default="$(find aliengo_wild_visual_navigation)/config/wild_visual_navigation/camera.yaml"/>
+    <arg name="params_file"       default="$(find aliengo_wild_visual_navigation)/config/wild_visual_navigation/aliengo.yaml"/>
+    <arg name="overlay_images"    default="true"/>
+
+    <include file="$(find wild_visual_navigation_ros)/launch/wild_visual_navigation.launch">
+        <arg name="camera_file"    value="$(arg camera_file)"/>
+        <arg name="params_file"    value="$(arg params_file)"/>
+        <arg name="overlay_images" value="$(arg overlay_images)"/>
+    </include>
+
+    <!-- Jackal state converter required by WVN -->
+    <node name="aliengo_state_converter_node" pkg="aliengo_wild_visual_navigation" type="aliengo_state_converter_node.py"/>
+
+</launch>  

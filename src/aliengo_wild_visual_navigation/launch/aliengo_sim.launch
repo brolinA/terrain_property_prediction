@@ -22,7 +22,7 @@
 
     <!-- rviz -->
     <node if="$(arg rviz)" name="rviz" pkg="rviz" type="rviz"
-            args="-d $(find aliengo_wild_visual_navigation)/rviz/rviz_visualization.rviz"
+            args="-d $(find aliengo_wild_visual_navigation)/config/rviz/rviz_visualization.rviz"
             output="screen"/>
 
 </launch>

@@ -11,12 +11,15 @@ https://github.com/brolinA/terrain_property_prediction.git --recurse-submodules 
 
 Check if you are in the `mini-project` branch.
 
-The follow the instruction to download and install all the dependencies for **wild visual navigation** from [here](https://github.com/leggedrobotics/wild_visual_navigation/tree/main)
+Then follow the instruction to download and install all the dependencies for **wild visual navigation** from [here](https://github.com/leggedrobotics/wild_visual_navigation/tree/main). Make sure that you have the `wild_visual_navigation` package in the ROS workspace you are working on.
 
 - You can skip either create the virtual environment mentioned in the WVN README or ignore it if you want to setup everything natively.
 - You can also simply use
 
-**Note: While installing the dependencies mentioned in wild_visual_navigation and self_supervised_segmentation packages you might get some python dependency issues which is likely because of conflicting python package dependency. Unfortunately, you will have to deal with it yourself. I don't remember how I fixed it :wink:**
+**Note:**
+
+- While installing the dependencies mentioned in wild_visual_navigation and self_supervised_segmentation packages you might get some python dependency issues which is likely because of conflicting python package dependency. Unfortunately, you will have to deal with it yourself. I don't remember how I fixed it :wink:
+- Make sure to do `catkin build` inside the virtual environment if you created it. If you managed to get everything installed in the native system then you don't have to worry about it.
 
 ## Aliengo simuation
 
@@ -41,4 +44,10 @@ Use the following command to suppress the warning messages.
 
 ```
 roslaunch aliengo_wild_visual_navigation aliengo_sim.launch 2> >(grep -v TF_REPEATED_DATA buffer_core)
+```
+
+You can run wild visual navigation using the following command.
+
+```
+ roslaunch aliengo_wild_visual_navigation aliengo_wild_visual_navigation.launch
 ```
