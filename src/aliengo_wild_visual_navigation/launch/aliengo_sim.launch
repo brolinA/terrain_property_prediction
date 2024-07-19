@@ -4,11 +4,11 @@
     <arg name="robot_name" default="/" />
     <arg name="rviz" default="true" />
     <!-- Path to Gazebo world you want to load. -->
-    <arg name="gazebo_world"
-        default="$(find aliengo_wild_visual_navigation)/worlds/agriculture_world.world" />
+    <arg name="world_model_name" default="agriculture_world" /> <!--OPTIONS: agriculture_world, outdoor-->
+    <arg name="gazebo_world"     default="$(find aliengo_wild_visual_navigation)/worlds/$(arg world_model_name).world" />
     <arg name="world_init_x" default="0.0" /> <!-- X Initial position of the robot in Gazebo World -->
-    <arg name="world_init_y" default="0.0" /> <!-- Y Initial position of the robot in Gazebo World -->
-    <arg name="world_init_z" default="0.0" />
+    <arg name="world_init_y" default="4.0" /> <!-- Y Initial position of the robot in Gazebo World -->
+    <arg name="world_init_z" default="0.6" /> <!-- Z Initial position of the robot in Gazebo World -->
 
     <!-- Spawn robot in gazebo -->
     <include file="$(find aliengo_config)/launch/gazebo.launch">
@@ -23,6 +23,7 @@
         type="gazebo_world_publisher.py" output="screen">
         <param name="world_frame_id" value="world" />
         <param name="base_frame_id" value="base" />
+        <param name="model_name" value="$(arg world_model_name)" />
     </node>
 
     <!-- rviz -->

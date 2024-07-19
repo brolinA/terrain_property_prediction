@@ -91,11 +91,12 @@ if __name__ == "__main__":
     world_frame_id = rospy.get_param('~world_frame_id')
     global base_frame_id
     base_frame_id = rospy.get_param('~base_frame_id')
+    model_name = rospy.get_param('~model_name')
     
     # Default variables
     rospack = rospkg.RosPack()
     pkg_path = rospack.get_path("aliengo_wild_visual_navigation")
-    default_model_file = f"{pkg_path}/Media/models/outdoor.dae"
+    default_model_file = f"{pkg_path}/Media/models/{model_name}/{model_name}.dae"
 
     # Initialize tf
     tf_buffer = tf2_ros.Buffer()

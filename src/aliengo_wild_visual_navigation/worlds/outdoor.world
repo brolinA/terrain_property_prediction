@@ -27,7 +27,7 @@
         <collision name="terrain_collision">
           <geometry>
             <mesh>
-              <uri>file://outdoor_world/outdoor.dae</uri>
+              <uri>file://outdoor/outdoor.dae</uri>
               <scale>1 1 1</scale>
             </mesh>
           </geometry>
@@ -35,13 +35,13 @@
         <visual name="terrain_visual">
           <geometry>
             <mesh>
-              <uri>file://outdoor_world/outdoor.dae</uri>
+              <uri>file://outdoor/outdoor.dae</uri>
               <scale>1 1 1</scale>
             </mesh>
           </geometry>
           <cast_shadows>false</cast_shadows>
         </visual>
       </link>
-	</model>
+    </model>
   </world>
 </sdf>
