@@ -52,5 +52,5 @@ print_image_callback_time: false
 print_supervision_callback_time: false
 log_time: false
 log_confidence: false
-verbose: true
+verbose: false
 extraction_store_folder: "nan"
