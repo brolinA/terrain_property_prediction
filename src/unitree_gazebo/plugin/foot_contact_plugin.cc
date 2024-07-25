@@ -10,6 +10,7 @@ Use of this source code is governed by the MPL-2.0 license, see LICENSE.
 #include <gazebo/gazebo.hh>
 #include <gazebo/sensors/sensors.hh>
 #include <geometry_msgs/WrenchStamped.h>
+#include <functional>
 
 namespace gazebo
 {
@@ -24,6 +25,13 @@ namespace gazebo
             //get the parent sensor
             this->parentSensor = std::dynamic_pointer_cast<sensors::ContactSensor>(_sensor); 
             
+            //get the frame id to use for the data
+            if (_sdf->HasElement("frameId")){
+                this->element_frame_id = _sdf->Get<std::string>("frameId");
+            } else{
+                this->element_frame_id = "/default_frame_id";
+            }
+
             // Make sure the parent sensor is valid.        
             if (!this->parentSensor){
                 gzerr << "UnitreeFootContactPlugin requires a ContactSensor.\n";
@@ -31,19 +39,16 @@ namespace gazebo
             }
             this->contact_namespace = "contact/";
             this->rosnode = new ros::NodeHandle(this->contact_namespace);
+            
             // add "visual" is for the same name of draw node
             this->force_pub = this->rosnode->advertise<geometry_msgs::WrenchStamped>("/visual/"+_sensor->Name()+"/the_force", 100);
             // Connect to the sensor update event.
             this->update_connection = this->parentSensor->ConnectUpdated(std::bind(&UnitreeFootContactPlugin::OnUpdate, this));
             this->parentSensor->SetActive(true); // Make sure the parent sensor is active.
             count = 0;
-            Fx = 0;
-            Fy = 0;
-            Fz = 0;
-            Tx = 0;
-            Ty = 0;
-            Tz = 0;
-            ROS_INFO("Load %s plugin.", _sensor->Name().c_str());
+            Fx = 0; Fy = 0; Fz = 0;
+            Tx = 0; Ty = 0; Tz = 0;
+            ROS_INFO("Load %s plugin with frame id %s .", _sensor->Name().c_str(), this->element_frame_id.c_str());
         }
 
         private:
@@ -52,17 +57,13 @@ namespace gazebo
             msgs::Contacts contacts;
             contacts = this->parentSensor->Contacts();
             count = contacts.contact_size();
-            // std::cout << "count_size for sensor: " << parentSensor->Name() << " is "<< count <<"\n";
             
             for (unsigned int i = 0; i < count; ++i){
                 if(contacts.contact(i).position_size() != 1){
                     ROS_ERROR("Contact count isn't correct!!!!");
                 }     
                 for (unsigned int j = 0; j < contacts.contact(i).position_size(); ++j){                 
-                    // std::cout << i <<" "<< contacts.contact(i).position_size() <<" Force:"
-                    //           << contacts.contact(i).wrench(j).body_1_wrench().force().x() << " "
-                    //           << contacts.contact(i).wrench(j).body_1_wrench().force().y() << " "
-                    //           << contacts.contact(i).wrench(j).body_1_wrench().force().z() << "\n";
+                    
                     Fx += contacts.contact(i).wrench(0).body_1_wrench().force().x(); // Notice: the force is in local coordinate, not in world or base coordnate.
                     Fy += contacts.contact(i).wrench(0).body_1_wrench().force().y();
                     Fz += contacts.contact(i).wrench(0).body_1_wrench().force().z();
@@ -81,14 +82,14 @@ namespace gazebo
                 force.wrench.torque.y = Ty/double(count);
                 force.wrench.torque.z = Tz/double(count);
                 count = 0;
-                Fx = 0;
-                Fy = 0;
-                Fz = 0;
-                Tx = 0;
-                Ty = 0;
-                Tz = 0;
+                Fx = 0; Fy = 0; Fz = 0;
+                Tx = 0; Ty = 0; Tz = 0;
             }
             else{
+
+                force.header.frame_id = this->element_frame_id;
+                force.header.stamp = ros::Time::now();
+
                 force.wrench.force.x = 0;
                 force.wrench.force.y = 0;
                 force.wrench.force.z = 0;
@@ -104,7 +105,7 @@ namespace gazebo
             ros::NodeHandle* rosnode;
             ros::Publisher force_pub;
             event::ConnectionPtr update_connection;
-            std::string contact_namespace;
+            std::string contact_namespace, element_frame_id;
             sensors::ContactSensorPtr parentSensor;      
             geometry_msgs::WrenchStamped force;
             int count = 0;
