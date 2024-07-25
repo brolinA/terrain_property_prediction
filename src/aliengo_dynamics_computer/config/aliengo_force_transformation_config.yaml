@@ -1,0 +1,7 @@
+aliengo:
+  base_frame: base_footprint
+  foot_topics:
+    - /visual/FL_foot_contact/the_force
+    - /visual/FR_foot_contact/the_force
+    - /visual/RL_foot_contact/the_force
+    - /visual/RR_foot_contact/the_force
