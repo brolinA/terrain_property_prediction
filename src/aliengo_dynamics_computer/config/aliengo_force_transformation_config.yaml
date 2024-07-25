@@ -1,5 +1,5 @@
 aliengo:
-  base_frame: base_footprint
+  base_frame: base
   foot_topics:
     - /visual/FL_foot_contact/the_force
     - /visual/FR_foot_contact/the_force

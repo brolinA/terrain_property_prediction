@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<robot name="sphere_description">
+
+    <!-- adding gazebo plugin -->
+    <gazebo reference="test_sphere">
+        <sensor name="contact_force_plugin" type="contact">
+            <update_rate>5</update_rate>
+            <plugin filename="libunitreeFootContactPlugin.so" name="contactPlugin" />
+            <contact>
+                <collision>base_fixed_joint_lump__collision_collision</collision>
+            </contact>
+        </sensor>
+    </gazebo>
+
+    <gazebo reference="base2">
+        <visual>
+            <plugin filename="libunitreeDrawForcePlugin.so" name="drawForcePlugin">
+                <!-- <topicName>contact_force</topicName> -->
+            </plugin>
+        </visual>
+    </gazebo>
+
+    <link name='test_sphere'>
+        <inertial>
+            <origin xyz="0 0 0" rpy="0 0 0" />
+            <mass value="0.5" />
+            <inertia
+                ixx="0.05" ixy="0" ixz="0"
+                iyy="0.05" iyz="0"
+                izz="0.05"
+            />
+        </inertial>
+
+        <visual name="visual">
+            <origin xyz="0 0 0" rpy="0 0 0" />
+            <geometry>
+                <sphere radius="0.5" />
+            </geometry>
+        </visual>
+
+        <collision name="collision">
+            <origin xyz="0 0 0" rpy="0 0 0" />
+            <geometry>
+                <sphere radius="0.5" />
+                <!-- <box size=".4 .2 .1" /> -->
+            </geometry>
+        </collision>
+    </link>
+
+    <link name="base"></link>
+    <link name="base2"></link>
+
+    <joint name="world_joint" type="fixed">
+        <origin xyz="0.0 0.0 0.0" rpy="0 0 0" />
+        <parent link="base" />
+        <child link="test_sphere" />
+    </joint>
+
+
+    <joint name="base2_joint" type="fixed">
+        <origin xyz="1.0 0.0 0.0" rpy="0 0 0" />
+        <parent link="base" />
+        <child link="base2" />
+    </joint>
+
+
+</robot>

@@ -9,6 +9,7 @@
 #include <geometry_msgs/Twist.h>
 #include <tf2/LinearMath/Quaternion.h>
 #include <tf2/LinearMath/Matrix3x3.h>
+#include <tf2_geometry_msgs/tf2_geometry_msgs.h>
 #include <tf2/LinearMath/Vector3.h>
 #include <message_filters/subscriber.h>
 #include <message_filters/synchronizer.h>
@@ -39,6 +40,10 @@ private:
 	message_filters::Subscriber<geometry_msgs::WrenchStamped> *foot_4;
 	message_filters::Synchronizer<footSyncPolicy> *footSynchronizer;
 
+    tf2_ros::Buffer tf_buffer_;
+    // tf2_ros::TransformListener tfListener(tf_buffer_, nh_);
+    tf2_ros::TransformListener *tf_listener_;
+
     //create functions
 
     /**
@@ -50,6 +55,8 @@ private:
      * @return transformation from source to target.
      */
     geometry_msgs::TransformStamped getTransformation(std::string source_frame, std::string target_frame);
+
+    tf2::Vector3 getTransformedForce (geometry_msgs::TransformStamped transform, geometry_msgs::WrenchStamped foot_force);
 
     void loadParams();
 

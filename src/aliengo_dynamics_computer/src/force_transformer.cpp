@@ -6,6 +6,7 @@ forceTransformer::forceTransformer(/* args */)
   //load all the variables
   loadParams();
 
+  tf_listener_ = new tf2_ros::TransformListener(tf_buffer_);
   //initialize the synchronizer
   foot_1 = new message_filters::Subscriber<geometry_msgs::WrenchStamped>(nh_, foot_topics_[0], 1);
   foot_2 = new message_filters::Subscriber<geometry_msgs::WrenchStamped>(nh_, foot_topics_[1], 1);
@@ -42,10 +43,43 @@ void forceTransformer::footSynchronizerCallback(const geometry_msgs::WrenchStamp
                                   const geometry_msgs::WrenchStampedConstPtr& foot3, const geometry_msgs::WrenchStampedConstPtr& foot4)
 {
   ROS_INFO("SYNC SUB --> F1: %f F3: %f" ,foot1->wrench.force.x, foot3->wrench.force.x);
+
+  geometry_msgs::TransformStamped curr_transform = getTransformation(foot1->header.frame_id, base_frame_);
+
+  tf2::Vector3 f = getTransformedForce(curr_transform, *foot1);
+  
 }
 
 geometry_msgs::TransformStamped forceTransformer::getTransformation(std::string source_frame, std::string target_frame)
-{  
+{
+  geometry_msgs::TransformStamped transform;
+
+  try{
+    transform = tf_buffer_.lookupTransform(target_frame, source_frame, ros::Time(0));
+  }
+  catch (tf2::TransformException &ex) {
+    ROS_WARN("%s",ex.what());
+  }
+
+  return transform;
+}
+
+tf2::Vector3 forceTransformer::getTransformedForce (geometry_msgs::TransformStamped transform, geometry_msgs::WrenchStamped foot_force)
+{
+  //create rotation matix
+  tf2::Quaternion q;
+  tf2::Matrix3x3 rot_matrix;
+  
+  tf2::convert (transform.transform.rotation, q);
+  rot_matrix.setRotation(q);
+
+  //create force vector
+  tf2::Vector3 force_vector(foot_force.wrench.force.x, foot_force.wrench.force.y, foot_force.wrench.force.z);
+
+  tf2::Vector3 tf_force = rot_matrix*force_vector;
+  // ROS_INFO("X: %f Y: %f Z: %f", tf_force.getX(),tf_force.getY(), tf_force.getZ());
+
+  return tf_force;
 }
 
 
@@ -59,9 +93,9 @@ geometry_msgs::TransformStamped forceTransformer::getTransformation(std::string 
 
   /*ros::Rate rate(10.0);
   while (node.ok()){
-    geometry_msgs::TransformStamped transformStamped;
+    geometry_msgs::TransformStamped transform;
     try{
-      transformStamped = tfBuffer.lookupTransform("base", "FL_calf",
+      transform = tfBuffer.lookupTransform("base", "FL_calf",
                                ros::Time(0));
     }
     catch (tf2::TransformException &ex) {
@@ -70,7 +104,7 @@ geometry_msgs::TransformStamped forceTransformer::getTransformation(std::string 
       continue;
     }
 
-    ROS_INFO("X: %f Y: %f Z: %f", transformStamped.transform.translation.x, transformStamped.transform.translation.y, transformStamped.transform.translation.z);
+    ROS_INFO("X: %f Y: %f Z: %f", transform.transform.translation.x, transform.transform.translation.y, transform.transform.translation.z);
 
     rate.sleep();
   }*
