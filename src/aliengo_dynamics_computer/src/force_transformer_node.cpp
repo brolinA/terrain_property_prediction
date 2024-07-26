@@ -7,6 +7,13 @@
  * \mainpage
  */
 
+/**
+ * @brief Main Function that starts the code by creating an instace of the class forceTransform()
+ * 
+ * @param argc 
+ * @param argv 
+ * @return int 
+ */
 int main(int argc, char **argv)
 {
     ros::init(argc, argv, "force_transformation_node");
