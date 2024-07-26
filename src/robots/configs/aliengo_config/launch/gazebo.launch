@@ -10,6 +10,8 @@
     <arg name="world_init_z"          default="0.0" />
     <arg name="world_init_heading" default="0.0" /> <!-- Initial heading of the robot in Gazebo World -->
     <arg name="enable_contact_sensor" default="false" />
+    <arg name="description_file"       default="$(find aliengo_description)/xacro/aliengo.champ.urdf"/> <!-- Path to URDF file Do not touch this. -->
+
 
     <param name="use_sim_time" value="true" />
 
@@ -22,6 +24,8 @@
         <arg name="hardware_connected"     value="false"/>
         <arg name="publish_foot_contacts"  value="true"/>
         <arg name="close_loop_odom"        value="true"/>
+        <arg name="description_file" value="$(arg description_file)" />
+
     </include>
 
     <include file="$(find champ_gazebo)/launch/gazebo.launch">

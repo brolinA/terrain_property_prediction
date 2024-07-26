@@ -9,6 +9,8 @@
     <arg name="world_init_x" default="0.0" /> <!-- X Initial position of the robot in Gazebo World -->
     <arg name="world_init_y" default="4.0" /> <!-- Y Initial position of the robot in Gazebo World -->
     <arg name="world_init_z" default="0.6" /> <!-- Z Initial position of the robot in Gazebo World -->
+    <arg name="description_file"       default="$(find aliengo_wild_visual_navigation)/xacro/aliengo.champ.urdf"/> <!-- Path to URDF file Do not touch this. -->
+
 
     <!-- Spawn robot in gazebo -->
     <include file="$(find aliengo_config)/launch/gazebo.launch">
@@ -16,6 +18,7 @@
         <arg name="world_init_x" value="$(arg world_init_x)" />
         <arg name="world_init_y" value="$(arg world_init_y)" />
         <arg name="world_init_z" value="$(arg world_init_z)" />
+        <arg name="description_file" value="$(arg description_file)" />
     </include>
 
     <!-- publish world in rviz for visualization -->

@@ -73,7 +73,11 @@ namespace gazebo
                     Tz += contacts.contact(i).wrench(0).body_1_wrench().torque().z();
                 }
             }
+            
+            force.header.frame_id = this->element_frame_id;
+            force.header.stamp = ros::Time::now();
             if(count != 0){           
+                
                 force.wrench.force.x = Fx/double(count);
                 force.wrench.force.y = Fy/double(count);
                 force.wrench.force.z = Fz/double(count);
@@ -86,10 +90,6 @@ namespace gazebo
                 Tx = 0; Ty = 0; Tz = 0;
             }
             else{
-
-                force.header.frame_id = this->element_frame_id;
-                force.header.stamp = ros::Time::now();
-
                 force.wrench.force.x = 0;
                 force.wrench.force.y = 0;
                 force.wrench.force.z = 0;
