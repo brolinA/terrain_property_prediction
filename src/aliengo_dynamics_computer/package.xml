@@ -76,6 +76,7 @@
   <exec_depend>tf2</exec_depend>
   <exec_depend>tf2_ros</exec_depend>
   <exec_depend>message_filteres</exec_depend>
+  <build_depend>pinocchio</build_depend>
 
 
   <!-- The export tag contains other, unspecified, tags -->

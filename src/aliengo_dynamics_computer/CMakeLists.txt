@@ -1,8 +1,8 @@
-cmake_minimum_required(VERSION 3.0.2)
+cmake_minimum_required(VERSION 3.10)
 project(aliengo_dynamics_computer)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
-# add_compile_options(-std=c++11)
+add_compile_options(-std=c++14)
 
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
@@ -19,6 +19,7 @@ find_package(catkin REQUIRED COMPONENTS
   message_generation
 )
 
+find_package(pinocchio REQUIRED)
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
 
@@ -123,6 +124,7 @@ catkin_package(
 include_directories(
   include
   ${catkin_INCLUDE_DIRS}
+  ${PINOCCHIO_INCLUDE_DIRS}
 )
 
 ## Declare a C++ library
@@ -158,6 +160,10 @@ include_directories(
 add_executable(force_transformer src/force_transformer_node.cpp
                                   src/force_transformer.cpp)
 target_link_libraries(force_transformer ${catkin_LIBRARIES})
+
+add_executable(inverse_dynamics_computer #src/force_transformer_node.cpp
+                                          src/inverse_dynamics_computer.cpp)
+target_link_libraries(inverse_dynamics_computer pinocchio::pinocchio)
 
 #############
 ## Install ##

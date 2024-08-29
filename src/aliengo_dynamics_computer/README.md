@@ -14,3 +14,15 @@ If you are updating function/code remember to comment them appropriately and the
 ```
 rosdoc_lite .
 ```
+
+#### Building the package.
+
+You can use normal `catkin build` to build the package. If you get error regarding **missing Boost version**, then use the following command
+
+```
+catkin build aliengo_dynamics_computer -DBOOST_DIR=<your/absolute/path/to/boost>
+```
+
+In my case the path the boost installation was in `/usr/include`. You need to find your installation location and use it here.
+
+You can also add `-DCMAKE_WARN_DEPRECATED=FALSE` to the build command to supress warning regarding deprecated cmake version 
