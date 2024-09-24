@@ -1,0 +1,359 @@
+Adding Body
+"trunk" connected to "base" through joint "floating_base"
+joint type: fixed joint
+joint placement:
+  R =
+1 0 0
+0 1 0
+0 0 1
+  p = 0 0 0
+
+body info: 
+  mass: 9.041
+  lever:  0.008465  0.004045 -0.000763
+  inertia elements (Ixx,Iyx,Iyy,Izx,Izy,Izz):    0.0332602 -0.000451628     0.161172  0.000487603   4.8356e-05     0.174604
+
+Adding Body
+"FL_hip" connected to "trunk" through joint "FL_hip_joint"
+joint type: joint REVOLUTE with axis
+joint placement:
+  R =
+1 0 0
+0 1 0
+0 0 1
+  p = 0.2399  0.051      0
+
+body info: 
+  mass: 1.993
+  lever: -0.022191  0.015144  -1.5e-05
+  inertia elements (Ixx,Iyx,Iyy,Izx,Izy,Izz): 0.00290389 -7.185e-05 0.00490752 -1.262e-06  -1.75e-06 0.00558694
+
+Adding Body
+"FL_thigh" connected to "FL_hip" through joint "FL_thigh_joint"
+joint type: joint CONTINUOUS with axis
+joint placement:
+  R =
+1 0 0
+0 1 0
+0 0 1
+  p =     0 0.083     0
+
+body info: 
+  mass: 0.639
+  lever: -0.005607 -0.003877 -0.048199
+  inertia elements (Ixx,Iyx,Iyy,Izx,Izy,Izz):   0.0056668   3.597e-06  0.00584723 0.000491446  1.0086e-05 0.000369811
+
+Adding Body
+"FL_calf" connected to "FL_thigh" through joint "FL_calf_joint"
+joint type: joint REVOLUTE with axis
+joint placement:
+  R =
+1 0 0
+0 1 0
+0 0 1
+  p =     0     0 -0.25
+
+body info: 
+  mass: 0.207
+  lever:  0.002781   6.3e-05 -0.142518
+  inertia elements (Ixx,Iyx,Iyy,Izx,Izy,Izz):  0.00634137      -3e-09  0.00635516 -8.7951e-05  -1.336e-06  3.9188e-05
+
+Adding Body
+"FL_foot" connected to "FL_calf" through joint "FL_foot_fixed"
+joint type: fixed joint
+joint placement:
+  R =
+1 0 0
+0 1 0
+0 0 1
+  p =     0     0 -0.25
+
+body info: 
+  mass: 0.06
+  lever: 0 0 0
+  inertia elements (Ixx,Iyx,Iyy,Izx,Izy,Izz): 1.6854e-05          0 1.6854e-05          0          0 1.6854e-05
+
+Adding Body
+"FR_hip" connected to "trunk" through joint "FR_hip_joint"
+joint type: joint REVOLUTE with axis
+joint placement:
+  R =
+1 0 0
+0 1 0
+0 0 1
+  p = 0.2399 -0.051      0
+
+body info: 
+  mass: 1.993
+  lever: -0.022191 -0.015144  -1.5e-05
+  inertia elements (Ixx,Iyx,Iyy,Izx,Izy,Izz): 0.00290389  7.185e-05 0.00490752 -1.262e-06   1.75e-06 0.00558694
+
+Adding Body
+"FR_thigh" connected to "FR_hip" through joint "FR_thigh_joint"
+joint type: joint CONTINUOUS with axis
+joint placement:
+  R =
+1 0 0
+0 1 0
+0 0 1
+  p =      0 -0.083      0
+
+body info: 
+  mass: 0.639
+  lever: -0.005607  0.003877 -0.048199
+  inertia elements (Ixx,Iyx,Iyy,Izx,Izy,Izz):   0.0056668  -3.597e-06  0.00584723 0.000491446 -1.0086e-05 0.000369811
+
+Adding Body
+"FR_calf" connected to "FR_thigh" through joint "FR_calf_joint"
+joint type: joint REVOLUTE with axis
+joint placement:
+  R =
+1 0 0
+0 1 0
+0 0 1
+  p =     0     0 -0.25
+
+body info: 
+  mass: 0.207
+  lever:  0.002781   6.3e-05 -0.142518
+  inertia elements (Ixx,Iyx,Iyy,Izx,Izy,Izz):  0.00634137      -3e-09  0.00635516 -8.7951e-05  -1.336e-06  3.9188e-05
+
+Adding Body
+"FR_foot" connected to "FR_calf" through joint "FR_foot_fixed"
+joint type: fixed joint
+joint placement:
+  R =
+1 0 0
+0 1 0
+0 0 1
+  p =     0     0 -0.25
+
+body info: 
+  mass: 0.06
+  lever: 0 0 0
+  inertia elements (Ixx,Iyx,Iyy,Izx,Izy,Izz): 1.6854e-05          0 1.6854e-05          0          0 1.6854e-05
+
+Adding Body
+"RL_hip" connected to "trunk" through joint "RL_hip_joint"
+joint type: joint REVOLUTE with axis
+joint placement:
+  R =
+1 0 0
+0 1 0
+0 0 1
+  p = -0.2399   0.051       0
+
+body info: 
+  mass: 1.993
+  lever: 0.022191 0.015144 -1.5e-05
+  inertia elements (Ixx,Iyx,Iyy,Izx,Izy,Izz): 0.00290389  7.185e-05 0.00490752  1.262e-06  -1.75e-06 0.00558694
+
+Adding Body
+"RL_thigh" connected to "RL_hip" through joint "RL_thigh_joint"
+joint type: joint CONTINUOUS with axis
+joint placement:
+  R =
+1 0 0
+0 1 0
+0 0 1
+  p =     0 0.083     0
+
+body info: 
+  mass: 0.639
+  lever: -0.005607 -0.003877 -0.048199
+  inertia elements (Ixx,Iyx,Iyy,Izx,Izy,Izz):   0.0056668   3.597e-06  0.00584723 0.000491446  1.0086e-05 0.000369811
+
+Adding Body
+"RL_calf" connected to "RL_thigh" through joint "RL_calf_joint"
+joint type: joint REVOLUTE with axis
+joint placement:
+  R =
+1 0 0
+0 1 0
+0 0 1
+  p =     0     0 -0.25
+
+body info: 
+  mass: 0.207
+  lever:  0.002781   6.3e-05 -0.142518
+  inertia elements (Ixx,Iyx,Iyy,Izx,Izy,Izz):  0.00634137      -3e-09  0.00635516 -8.7951e-05  -1.336e-06  3.9188e-05
+
+Adding Body
+"RL_foot" connected to "RL_calf" through joint "RL_foot_fixed"
+joint type: fixed joint
+joint placement:
+  R =
+1 0 0
+0 1 0
+0 0 1
+  p =     0     0 -0.25
+
+body info: 
+  mass: 0.06
+  lever: 0 0 0
+  inertia elements (Ixx,Iyx,Iyy,Izx,Izy,Izz): 1.6854e-05          0 1.6854e-05          0          0 1.6854e-05
+
+Adding Body
+"RR_hip" connected to "trunk" through joint "RR_hip_joint"
+joint type: joint REVOLUTE with axis
+joint placement:
+  R =
+1 0 0
+0 1 0
+0 0 1
+  p = -0.2399  -0.051       0
+
+body info: 
+  mass: 1.993
+  lever:  0.022191 -0.015144  -1.5e-05
+  inertia elements (Ixx,Iyx,Iyy,Izx,Izy,Izz): 0.00290389 -7.185e-05 0.00490752  1.262e-06   1.75e-06 0.00558694
+
+Adding Body
+"RR_thigh" connected to "RR_hip" through joint "RR_thigh_joint"
+joint type: joint CONTINUOUS with axis
+joint placement:
+  R =
+1 0 0
+0 1 0
+0 0 1
+  p =      0 -0.083      0
+
+body info: 
+  mass: 0.639
+  lever: -0.005607  0.003877 -0.048199
+  inertia elements (Ixx,Iyx,Iyy,Izx,Izy,Izz):   0.0056668  -3.597e-06  0.00584723 0.000491446 -1.0086e-05 0.000369811
+
+Adding Body
+"RR_calf" connected to "RR_thigh" through joint "RR_calf_joint"
+joint type: joint REVOLUTE with axis
+joint placement:
+  R =
+1 0 0
+0 1 0
+0 0 1
+  p =     0     0 -0.25
+
+body info: 
+  mass: 0.207
+  lever:  0.002781   6.3e-05 -0.142518
+  inertia elements (Ixx,Iyx,Iyy,Izx,Izy,Izz):  0.00634137      -3e-09  0.00635516 -8.7951e-05  -1.336e-06  3.9188e-05
+
+Adding Body
+"RR_foot" connected to "RR_calf" through joint "RR_foot_fixed"
+joint type: fixed joint
+joint placement:
+  R =
+1 0 0
+0 1 0
+0 0 1
+  p =     0     0 -0.25
+
+body info: 
+  mass: 0.06
+  lever: 0 0 0
+  inertia elements (Ixx,Iyx,Iyy,Izx,Izy,Izz): 1.6854e-05          0 1.6854e-05          0          0 1.6854e-05
+
+Adding Body
+"camera_link" connected to "trunk" through joint "camera_joint"
+joint type: fixed joint
+joint placement:
+  R =
+1 0 0
+0 1 0
+0 0 1
+  p = 0.3235      0 -0.066
+
+body info: 
+  mass: 0.2
+  lever: 0 0 0
+  inertia elements (Ixx,Iyx,Iyy,Izx,Izy,Izz): 0.00058083          0 3.0833e-05          0          0 0.00059083
+
+Adding Body
+"camera_depth_frame" connected to "camera_link" through joint "camera_depth_joint"
+joint type: fixed joint
+joint placement:
+  R =
+1 0 0
+0 1 0
+0 0 1
+  p =     0 0.049     0
+
+body info: 
+  mass: 0
+  lever: 0 0 0
+  inertia elements (Ixx,Iyx,Iyy,Izx,Izy,Izz): 0 0 0 0 0 0
+
+Adding Body
+"camera_depth_optical_frame" connected to "camera_depth_frame" through joint "camera_depth_optical_joint"
+joint type: fixed joint
+joint placement:
+  R =
+4.89664e-12 4.89658e-12           1
+         -1           0 4.89658e-12
+5.55112e-17          -1 4.89664e-12
+  p = 0 0 0
+
+body info: 
+  mass: 0
+  lever: 0 0 0
+  inertia elements (Ixx,Iyx,Iyy,Izx,Izy,Izz): 0 0 0 0 0 0
+
+Adding Body
+"camera_rgb_frame" connected to "camera_link" through joint "camera_rgb_joint"
+joint type: fixed joint
+joint placement:
+  R =
+1 0 0
+0 1 0
+0 0 1
+  p =     0 0.022     0
+
+body info: 
+  mass: 0
+  lever: 0 0 0
+  inertia elements (Ixx,Iyx,Iyy,Izx,Izy,Izz): 0 0 0 0 0 0
+
+Adding Body
+"camera_rgb_optical_frame" connected to "camera_rgb_frame" through joint "camera_rgb_optical_joint"
+joint type: fixed joint
+joint placement:
+  R =
+4.89664e-12 4.89658e-12           1
+         -1           0 4.89658e-12
+5.55112e-17          -1 4.89664e-12
+  p = 0 0 0
+
+body info: 
+  mass: 0
+  lever: 0 0 0
+  inertia elements (Ixx,Iyx,Iyy,Izx,Izy,Izz): 0 0 0 0 0 0
+
+Adding Body
+"hokuyo_frame" connected to "trunk" through joint "hokuyo_joint"
+joint type: fixed joint
+joint placement:
+  R =
+1 0 0
+0 1 0
+0 0 1
+  p =     0     0 0.096
+
+body info: 
+  mass: 0.27
+  lever: 0 0 0
+  inertia elements (Ixx,Iyx,Iyy,Izx,Izy,Izz): 0.0002632         0 0.0002632         0         0  0.000162
+
+Adding Body
+"imu_link" connected to "trunk" through joint "imu_joint"
+joint type: fixed joint
+joint placement:
+  R =
+1 0 0
+0 1 0
+0 0 1
+  p = 0 0 0
+
+body info: 
+  mass: 0.001
+  lever: 0 0 0
+  inertia elements (Ixx,Iyx,Iyy,Izx,Izy,Izz): 1e-09     0 1e-09     0     0 1e-09

@@ -1,7 +1,7 @@
 
 #include <ros/ros.h>
 #include <ros/console.h>
-#include "aliengo_dynamics_computer/force_transformer.h"
+#include "aliengo_dynamics_computer/force_transformer.hpp"
 
 /**
  * \mainpage

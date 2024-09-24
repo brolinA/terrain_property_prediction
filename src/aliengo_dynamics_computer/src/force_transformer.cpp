@@ -1,5 +1,5 @@
 
-#include "aliengo_dynamics_computer/force_transformer.h"
+#include "aliengo_dynamics_computer/force_transformer.hpp"
 
 forceTransformer::forceTransformer(/* args */)
 {
@@ -16,7 +16,8 @@ forceTransformer::forceTransformer(/* args */)
                          *foot_1_, *foot_2_, *foot_3_, *foot_4_);
 
   footSynchronizer->registerCallback(boost::bind(&forceTransformer::footSynchronizerCallback, this, _1, _2, _3, _4));
-  reaction_force_pub_ = nh_.advertise<aliengo_dynamics_computer::ReactionForce>("leg_reaction_forces", 2);
+  reaction_force_pub_ = nh_.advertise<aliengo_dynamics_computer::ReactionForce>("gazebo_leg_forces_components", 2);
+  foot_force_pub_ = nh_.advertise<aliengo_dynamics_computer::FootForces>("gazebo_leg_forces_magnitude", 2);
 
   ROS_INFO("Done initializing %s", ros::this_node::getName().c_str());
 
@@ -29,14 +30,15 @@ forceTransformer::~forceTransformer()
 
 void forceTransformer::loadParams()
 {
-  nh_.param<std::string>("aliengo/base_frame", base_frame_, "base_link");
+  ros::NodeHandle nh("~");
+  nh.param<std::string>("aliengo/base_frame", base_frame_, "base_link");
 
   //reading all the topics
-  nh_.getParam("aliengo/foot_topics", foot_topics_);
+  nh.getParam("aliengo/foot_topics", foot_topics_);
   
   if(foot_topics_.size()!=4)
   {
-    ROS_WARN("Only 4 topics are supported currently. Check the topics again. Shutting down now.");
+    ROS_WARN("Only 4 topics are supported currently. Check the topics again. Shutting down now. Current size: %zu", foot_topics_.size());
     ros::shutdown();
   }
 }
@@ -44,18 +46,23 @@ void forceTransformer::loadParams()
 void forceTransformer::footSynchronizerCallback(const geometry_msgs::WrenchStampedConstPtr& foot1, const geometry_msgs::WrenchStampedConstPtr& foot2,
                                   const geometry_msgs::WrenchStampedConstPtr& foot3, const geometry_msgs::WrenchStampedConstPtr& foot4)
 {
-  // ROS_INFO("SYNC SUB --> F1: %f F3: %f" ,foot1->wrench.force.x, foot3->wrench.force.x);
-
-  aliengo_dynamics_computer::ReactionForce leg_forces;
+  aliengo_dynamics_computer::ReactionForce component_reaction_forces;
+  aliengo_dynamics_computer::FootForces magnitude_forces;
 
   //transform force for every leg
-  leg_forces.reaction_forces.push_back(transformForce(*foot1));
-  leg_forces.reaction_forces.push_back(transformForce(*foot2));
-  leg_forces.reaction_forces.push_back(transformForce(*foot3));
-  leg_forces.reaction_forces.push_back(transformForce(*foot4));
+  // leg_forces.reaction_forces.push_back(transformForce(*foot1));
+  // leg_forces.reaction_forces.push_back(transformForce(*foot2));
+  // leg_forces.reaction_forces.push_back(transformForce(*foot3));
+  // leg_forces.reaction_forces.push_back(transformForce(*foot4));
+  transformForce(*foot1, component_reaction_forces, magnitude_forces.FL_foot);
+  transformForce(*foot2, component_reaction_forces, magnitude_forces.FR_foot);
+  transformForce(*foot3, component_reaction_forces, magnitude_forces.RL_foot);
+  transformForce(*foot4, component_reaction_forces, magnitude_forces.RR_foot);
   ROS_INFO("--------------------------");
+
   //publish force
-  reaction_force_pub_.publish(leg_forces);
+  reaction_force_pub_.publish(component_reaction_forces);
+  foot_force_pub_.publish(magnitude_forces);
 }
 
 geometry_msgs::TransformStamped forceTransformer::getTransformation(std::string source_frame, std::string target_frame)
@@ -90,7 +97,8 @@ tf2::Vector3 forceTransformer::getTransformedForce (geometry_msgs::TransformStam
   return tf_force;
 }
 
-geometry_msgs::WrenchStamped forceTransformer::transformForce(geometry_msgs::WrenchStamped foot_force)
+// geometry_msgs::WrenchStamped forceTransformer::transformForce(geometry_msgs::WrenchStamped foot_force)
+void forceTransformer::transformForce(geometry_msgs::WrenchStamped foot_force, aliengo_dynamics_computer::ReactionForce& component_force, float& magnitude)
 {
   geometry_msgs::WrenchStamped transformed_force;
 
@@ -108,9 +116,12 @@ geometry_msgs::WrenchStamped forceTransformer::transformForce(geometry_msgs::Wre
   transformed_force.wrench.force.y = force_vector.getY();
   transformed_force.wrench.force.z = force_vector.getZ();
 
-  ROS_INFO("Mag %s : %lf", foot_force.header.frame_id.c_str(), 
-            std::sqrt(pow(force_vector.getX(),2)+pow(force_vector.getY(),2)+pow(force_vector.getZ(),2)));
-  return transformed_force;
+  magnitude = std::sqrt(pow(force_vector.getX(),2)+pow(force_vector.getY(),2)+pow(force_vector.getZ(),2));
+  component_force.reaction_forces.push_back(transformed_force);
+
+  ROS_INFO("Mag %s : %lf", foot_force.header.frame_id.c_str(), magnitude);
+
+  // return transformed_force;
   // leg_forces.reaction_forces.push_back(forceToWrenchStamped(force_vector, foot_force->header.frame_id, curr_transform.header.frame_id));
 }
 

@@ -58,6 +58,7 @@ find_package(pinocchio REQUIRED)
 add_message_files(
   FILES
   ReactionForce.msg
+  FootForces.msg
 )
 
 ## Generate services in the 'srv' folder
@@ -166,6 +167,8 @@ add_dependencies(force_transformer ${catkin_EXPORTED_TARGETS})
 add_executable(inverse_dynamics_computer src/inverse_dynamics_computer_node.cpp
                                          src/inverse_dynamics_computer.cpp)
 target_link_libraries(inverse_dynamics_computer pinocchio::pinocchio ${catkin_LIBRARIES})
+add_dependencies(inverse_dynamics_computer ${catkin_EXPORTED_TARGETS})
+
 
 #############
 ## Install ##

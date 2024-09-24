@@ -11,6 +11,8 @@ computeInverseDynamics::computeInverseDynamics(std::string robot_model_path)
 
 		joint_data_sub_ = nh_.subscribe("/joint_states", 10, &computeInverseDynamics::jointDataCallback, this);
 		odom_sub_ = nh_.subscribe("/odom", 10, &computeInverseDynamics::odometryCallback, this);
+		force_pub_ = nh_.advertise<aliengo_dynamics_computer::FootForces>("pinocchio_leg_forces_magnitude", 10);
+		reaction_force_pub_ = nh_.advertise<aliengo_dynamics_computer::ReactionForce>("pinocchio_leg_forces_components", 10);
     createModelAndData(robot_model_path);
     ROS_INFO("Successfully initialized");
 }
@@ -32,43 +34,6 @@ void computeInverseDynamics::createModelAndData(std::string urdf_path)
 	q_dot_ = Eigen::VectorXd(robot_model_.nv);
 	torque_ = Eigen::VectorXd(robot_model_.nv);
 
-	//initializing joint position and velocity to zeros
-	// q_ = randomConfiguration(robot_model_); //to test q
-  // q_[0] = 1.0; q_[1] = 1.0; q_[2] = 1.0; //to test q
-
-	 
-	// Eigen::RowVectorXd q_test_(19);
-	// q_test_ << 0.0, 0.0, 0.35, 0.0, 0.0, 0.0, 1.0,
-	// 		 -0.0031345892050191893, 0.966314043646169, -1.6204728852253254, 
-	// 		 0.006543744565955301, 0.9828929825293384, -1.6231658767648796, 
-	// 		 -0.0019896509839556487, 0.917828881092067, -1.6323097227361814, 
-	// 		 0.0023186819676359605, 0.9159782798843361, -1.6311252805254828;
-	// q_ = q_test_.transpose();
-	
-	// Eigen::RowVectorXd test_torque_(18);
-	// test_torque_ << 0, 0, 0, 0, 0, 0,
-	// 								6.936555667870072, -1.5789749897447336, -4.392563649343796, 
-	// 								5.020491710991956, 0.6820409727028703, -10.327255721996368, 
-	// 								9.238395972928496, -1.2266879684590393, 2.8549442232364406, 
-	// 								10.251147044489567, 1.3488240309888766, 5.169799373093317;
-
-	// // q_ = Eigen::VectorXd::Zero(robot_model_.nq);
-	// // q_dot_ = Eigen::VectorXd::Zero(robot_model_.nv);
-
-	// Eigen::RowVectorXd test_vel_(18);
-	// test_vel_ << 0, 0, 0, 0, 0, 0,
-	// 						-0.0005167541598068751, -0.1485678763279267, 0.24284998193821486, 
-	// 						-0.0009379085241691798, -0.18031369453816873, 0.2890807213366897, 
-	// 						0.00016128987056339032, -0.10699159931474307, 0.18132861039808412, 
-	// 						-0.000202119745340932, -0.10206431087830797, 0.1731220393803563;
-	// q_dot_ = test_vel_.transpose();
-	
-
-  // std::cout << "Joint Dimension: " << robot_model_.nq <<std::endl;
-  // std::cout << "Velocity Dimension: " << robot_model_.nv <<std::endl;
-  // std::cout << "q: " << q_.transpose() << std::endl;
-  // std::cout << "q_dots: " << q_dot_.transpose() << std::endl;
-
 	//Define the contact points and get the ID to compute jacobians
 	contact_points_ = {"FL_foot_fixed", "FR_foot_fixed", "RL_foot_fixed", "RR_foot_fixed"}; //using suffix fixed here to indicate joint type
 	
@@ -77,64 +42,7 @@ void computeInverseDynamics::createModelAndData(std::string urdf_path)
     // std::cout << contact_pt << ": " << contact_pt_ids_.back() << std::endl;
   }
 
-	//-------------------------------TEST--------------------------
-	//computing all the terms. result is stored in the robot_model_variable
-  /*pinocchio::computeAllTerms(robot_model_, robot_data_, q_, q_dot_);
-
-	//compute corriollis matrix
-  pinocchio::computeCoriolisMatrix(robot_model_, robot_data_, q_, q_dot_);
-  
-	//updating the robot model in pinocchio
-	forwardKinematics(robot_model_, robot_data_, q_); //updates joint placement according to current joint configuration
-  updateFramePlacements(robot_model_, robot_data_);
-
-	//compute Jacobian
-	//Method 1: Compute Jacobian frame-by-frame for all contact points
-
-	std::vector<Data::Matrix6x> frameJacobians;
-  for (auto contact_id:contact_pt_ids_){
-    Data::Matrix6x J(6, robot_model_.nv);
-    J.setZero();
-
-    computeFrameJacobian(robot_model_, robot_data_, q_, contact_id, LOCAL_WORLD_ALIGNED, J);
-    frameJacobians.push_back(J);
-
-		//print Jacobian
-		// std::cout << "Jacobian for contact id " << contact_id << " : \n" << J.block(0,0, 3, 18 ) << std::endl;
-  }
-
-	Eigen::MatrixXd jointJacobian(12, robot_model_.nv);
-	// Eigen::Matrix<double, 12, 18> jointJacobian; //(12, robot_model_.nv);
-	jointJacobian.setZero();
-	int row_number = 0;
-	for(auto frameJacobian:frameJacobians)
-	{
-		jointJacobian.block(row_number, 0, 3, robot_model_.nv ) << frameJacobian.block(0,0, 3, robot_model_.nv);
-		row_number += 3;
-	}
-
-	// std::cout << "Full Jacobian ("<< jointJacobian.rows() << " x " << jointJacobian.cols()<< "): \n" 
-						// << jointJacobian << std::endl;
-
-	//pseudo inverse computation
-	Eigen::MatrixXd invJointJacobian = jointJacobian.transpose().completeOrthogonalDecomposition().pseudoInverse();
-
-	//Force computation
-	Eigen::VectorXd force_;
-	force_ = invJointJacobian * ( robot_data_.M * q_dot_ + robot_data_.nle - test_torque_.transpose());
-
-	std::cout << "Force (F): " << force_.transpose() << std::endl;
-	std::cout << "robot mass: " << robot_data_.mass[0] * 9.81 << std::endl;
-
-	Eigen::Vector4d lf = util_func_.computeForcePerLeg(contact_points_, force_, true);
-	
-	//Method 2: compute jacobian for the entire model 
-	//This computes in the world frame. So we are not using this.
-	// Data::Matrix6x full_jacobian(6, robot_model_.nv);
-  // full_jacobian = computeJointJacobians(robot_model_, robot_data_, q_);
-
-	robot_data_buffer_.push_back(robot_data_); //store the data for later use
-
+	/*
 	//Debug prints
 	// ROS_INFO("Matrix sizes:");
 	// ROS_INFO("M: %ldx%ld", robot_data_.M.rows(), robot_data_.M.cols());
@@ -145,6 +53,7 @@ void computeInverseDynamics::createModelAndData(std::string urdf_path)
 	// ROS_INFO("q: %ldx%ld", q_.rows(), q_.cols());
 	// ROS_INFO("q_dot: %ldx%ld", q_dot_.rows(), q_dot_.cols());
 	// ROS_INFO("Force: %ldx%ld", force_.rows(), force_.cols());
+	std::cout << "robot mass: " << robot_data_.mass[0] * 9.81 << std::endl;
 
 	//list of all joints and their DOF
 	
@@ -248,10 +157,13 @@ void computeInverseDynamics::computeFootForce()
 
 	std::cout << "Force (F): " << force_.transpose() << std::endl;
 
-	Eigen::Vector4d lf = util_func_.computeForcePerLeg(contact_points_, force_, true); //just for printing
+	Eigen::Vector4d leg_force = util_func_.computeForcePerLeg(contact_points_, force_, true);
+	publishFootForce(leg_force);
 
 	aliengo_dynamics_computer::ReactionForce leg_reaction_forces;
 	util_func_.vectorToForceMsg(contact_points_, force_, leg_reaction_forces);
+	reaction_force_pub_.publish(leg_reaction_forces);
+
 }
 
 void computeInverseDynamics::computeFrameJacobians(std::vector<Data::Matrix6x>& frame_jacobian)
@@ -282,37 +194,17 @@ void computeInverseDynamics::createFullModelJacobian(std::vector<Data::Matrix6x>
 		// std::cout << "Full Jacobian " << full_jacobian << std::endl;
 }
 
-/*{
-		//setup the q_ and q_dot_ vectors using the data
-	// q_ = ;
-	// q_dot_ = ;
+void computeInverseDynamics::publishFootForce(Eigen::Vector4d foot_forces)
+{
+	//the order of force is the same as defined in contact_points_ variable
+	//For reference:
+	//contact_points_ = {"FL_foot_fixed", "FR_foot_fixed", "RL_foot_fixed", "RR_foot_fixed"}
+	
+	aliengo_dynamics_computer::FootForces forces;
+	forces.FL_foot = foot_forces[0];
+	forces.FR_foot = foot_forces[1];
+	forces.RL_foot = foot_forces[2];
+	forces.RR_foot = foot_forces[3];
 
-	//computing all the terms. result is stored in the robot_model_variable
-  pinocchio::computeAllTerms(robot_model_, robot_data_, q_, q_dot_);
-
-	//compute corriollis matrix
-  pinocchio::computeCoriolisMatrix(robot_model_, robot_data_, q_, q_dot_);
-  
-	//updating the robot model in pinocchio
-	forwardKinematics(robot_model_, robot_data_, q_); //updates joint placement according to current joint configuration
-  updateFramePlacements(robot_model_, robot_data_);
-
-	//compute Jacobian
-	//Method 1: Compute Jacobian frame-by-frame for all contact points
-
-	std::vector<Data::Matrix6x> frameJacobian;
-  for (auto contact_id:contact_pt_ids_){
-    Data::Matrix6x J(6, robot_model_.nv);
-    J.setZero();
-
-    computeFrameJacobian(robot_model_, robot_data_, q_, contact_id, LOCAL_WORLD_ALIGNED, J);
-    frameJacobian.push_back(J);
-  }
-
-	//Method 2: compute jacobian for the entire model
-	Data::Matrix6x full_jacobian(6, robot_model_.nv);
-
-  full_jacobian = computeJointJacobians(robot_model_, robot_data_, q_);
-
-	robot_data_buffer_.push_back(robot_data_); //store the data for later use
-}*/
+	force_pub_.publish(forces);
+}
