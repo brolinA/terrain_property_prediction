@@ -1,0 +1,6 @@
+<launch>
+    <node name="gazebo_force_publisher" pkg="aliengo_dynamics_computer"
+        type="force_transformer" output="screen">
+        <rosparam command="load" file="$(find aliengo_dynamics_computer)/config/aliengo_force_transformation_config.yaml" />
+    </node>
+</launch>

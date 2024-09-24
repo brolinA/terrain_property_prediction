@@ -24,6 +24,7 @@
 #include "aliengo_dynamics_computer/utils.hpp"
 //custom message
 #include <aliengo_dynamics_computer/ReactionForce.h>
+#include <aliengo_dynamics_computer/FootForces.h>
 
 using namespace pinocchio;
 
@@ -92,6 +93,11 @@ private:
 
     ros::Subscriber odom_sub_;
 
+    ros::Publisher force_pub_; //!< publish the cumulative force per leg
+
+    ros::Publisher reaction_force_pub_; //!< publish the force as x,y,z components per leg
+
+
     //Function definitions
 
     /**!
@@ -112,6 +118,8 @@ private:
     void computeFrameJacobians(std::vector<Data::Matrix6x>& frame_jacobian);
 
     void createFullModelJacobian(std::vector<Data::Matrix6x> frame_jacobian, Eigen::MatrixXd& full_jacobian);
+
+    void publishFootForce(Eigen::Vector4d foot_forces);
 
 }; //end computeInverseDynamics
 

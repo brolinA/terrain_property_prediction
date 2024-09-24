@@ -15,6 +15,7 @@
 #include <message_filters/synchronizer.h>
 #include <message_filters/sync_policies/approximate_time.h>
 //custom message
+#include <aliengo_dynamics_computer/FootForces.h>
 #include <aliengo_dynamics_computer/ReactionForce.h>
 class forceTransformer
 {
@@ -95,6 +96,12 @@ private:
      */
     ros::Publisher reaction_force_pub_;
 
+    /**
+     * @brief ROS publisher for reaction force
+     * 
+     */
+    ros::Publisher foot_force_pub_;
+
     //create functions
 
     /**
@@ -139,7 +146,7 @@ private:
      * @param foot_force 
      * @return geometry_msgs::WrenchStamped 
      */
-    geometry_msgs::WrenchStamped transformForce(geometry_msgs::WrenchStamped foot_force);
+    void transformForce(geometry_msgs::WrenchStamped foot_force, aliengo_dynamics_computer::ReactionForce& component_force, float& magnitude);
 
 public:
     /**
