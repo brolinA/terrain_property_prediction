@@ -17,6 +17,7 @@ find_package(catkin REQUIRED COMPONENTS
   tf2_ros
   message_filters
   message_generation
+  control_msgs
 )
 
 find_package(pinocchio REQUIRED)
@@ -76,7 +77,7 @@ add_message_files(
 ## Generate added messages and services with any dependencies listed here
 generate_messages(
   DEPENDENCIES
-  geometry_msgs std_msgs #   sensor_msgs#   std_msgs
+  geometry_msgs std_msgs sensor_msgs std_msgs
 )
 
 ################################################
@@ -160,10 +161,11 @@ include_directories(
 add_executable(force_transformer src/force_transformer_node.cpp
                                   src/force_transformer.cpp)
 target_link_libraries(force_transformer ${catkin_LIBRARIES})
+add_dependencies(force_transformer ${catkin_EXPORTED_TARGETS})
 
-add_executable(inverse_dynamics_computer #src/force_transformer_node.cpp
-                                          src/inverse_dynamics_computer.cpp)
-target_link_libraries(inverse_dynamics_computer pinocchio::pinocchio)
+add_executable(inverse_dynamics_computer src/inverse_dynamics_computer_node.cpp
+                                         src/inverse_dynamics_computer.cpp)
+target_link_libraries(inverse_dynamics_computer pinocchio::pinocchio ${catkin_LIBRARIES})
 
 #############
 ## Install ##

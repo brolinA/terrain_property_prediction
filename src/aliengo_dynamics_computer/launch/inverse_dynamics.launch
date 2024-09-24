@@ -1,0 +1,8 @@
+<launch>
+    <node name="aliengo_inverse_dynamics" pkg="aliengo_dynamics_computer"
+        type="inverse_dynamics_computer" output="screen">
+        <param name="robot_urdf"
+            value="$(find aliengo_wild_visual_navigation)/xacro/pinnochio_aliengo.champ.urdf" />
+    </node>
+</launch>
+<!-- launch-prefix="gdb -ex run -args" -->
