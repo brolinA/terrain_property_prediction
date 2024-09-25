@@ -85,7 +85,7 @@ private:
     tf2_ros::Buffer tf_buffer_;
 
     /**
-     * @brief Tf listerner to compute the transformation
+     * @brief Tf listener to compute the transformation
      * 
      */
     tf2_ros::TransformListener *tf_listener_;
@@ -108,7 +108,7 @@ private:
      * \brief Function to get the transformation between source frame and target frame
      * 
      * @param source_frame - frame that needs to be transformed 
-     * @param target_frame - frame to which we want to tranform to 
+     * @param target_frame - frame to which we want to transform to 
      * 
      * @return transformation from source to target.
      */
@@ -130,7 +130,7 @@ private:
     void loadParams();
 
     /**
-     * @brief Callback function for the message synchroniser
+     * @brief Callback function for the message synchronizer
      * 
      * @param foot1 - Force on foot 1
      * @param foot2 - Force of foot 2
@@ -143,8 +143,10 @@ private:
     /**
      * @brief Function to transform the force from force frame to #base_frame_
      * 
-     * @param foot_force 
-     * @return geometry_msgs::WrenchStamped 
+     * @param foot_force force value from the sensor
+     * @param component_force force after transforming to #base_frame_ topic
+     * @param magnitude total magnitude of the force in all direction
+     * @return none
      */
     void transformForce(geometry_msgs::WrenchStamped foot_force, aliengo_dynamics_computer::ReactionForce& component_force, float& magnitude);
 

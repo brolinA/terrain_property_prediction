@@ -8,7 +8,7 @@
  */
 
 /**
- * @brief Main Function that starts the code by creating an instace of the class forceTransform()
+ * @brief Main Function that starts the code by creating an instance of the class forceTransform()
  * 
  * @param argc 
  * @param argv 

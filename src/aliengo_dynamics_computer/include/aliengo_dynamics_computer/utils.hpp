@@ -8,13 +8,24 @@ class utilFunction
 {
 public:
 
+/**
+	* @brief Function to extract the force values for each leg
+	* 
+	* @param contact_points - name of the #contact_points_ to be used for header frames
+	* @param forces - vector with force in x,y,z direction for each leg
+	* @param print_debug - enable print statements. Turned off by default
+	*
+	* @return Eigen::Vector4d - Vector of shape 4x1 having the magnitude of force in each leg
+*/
 Eigen::Vector4d computeForcePerLeg(std::vector<std::string> contact_points, Eigen::VectorXd forces, bool print_debug=false)
 {
 	int vector_pos = 0; //vector position
 	int i=0;
 	Eigen::Vector4d leg_force;
+
 	for(auto contact_pt:contact_points)
 	{
+		//compute the magnitude for each leg
 		leg_force[i] = sqrt(forces.block(vector_pos, 0, 3, 1).array().square().sum());
 		if(print_debug) ROS_INFO("Force on frame %s is %lf", contact_pt.c_str(), leg_force[i]);
 		
@@ -27,6 +38,13 @@ Eigen::Vector4d computeForcePerLeg(std::vector<std::string> contact_points, Eige
 	return leg_force;
 }
 
+/**
+ * @brief Function to convert from geometry_msgs::Twist to Eigen::VectorXd
+ * 
+ * @param msg - input twist message
+ * 
+ * @return Eigen::VectorXd - converted message
+ */
 Eigen::VectorXd twistToVector(geometry_msgs::Twist msg)
 {
 	Eigen::VectorXd vel_vec(6);
@@ -36,6 +54,13 @@ Eigen::VectorXd twistToVector(geometry_msgs::Twist msg)
 	return vel_vec;
 }
 
+/**
+ * @brief Function to convert from geometry_msgs::Pose to Eigen::VectorXd
+ * 
+ * @param msg - input pose message
+ * 
+ * @return Eigen::VectorXd - converted message
+ */
 Eigen::VectorXd poseToVector(geometry_msgs::Pose msg)
 {
 	Eigen::VectorXd pos_vec(7);
@@ -45,6 +70,15 @@ Eigen::VectorXd poseToVector(geometry_msgs::Pose msg)
 	return pos_vec;
 }
 
+/**
+ * @brief Function to extract component forces in x,y,z direction from force vector
+ * 
+ * @param contact_points - Name of the contact points of force
+ * @param force_vector - vector containing the component force values for all leg
+ * @param leg_forces - Reference variable to store the extracted force values
+ * 
+ * @return none
+ */
 void vectorToForceMsg(std::vector<std::string> contact_points, Eigen::VectorXd force_vector, aliengo_dynamics_computer::ReactionForce& leg_forces)
 {
 	geometry_msgs::WrenchStamped single_leg_force;
@@ -64,7 +98,6 @@ void vectorToForceMsg(std::vector<std::string> contact_points, Eigen::VectorXd f
 
 		leg_forces.reaction_forces.push_back(single_leg_force);
 	}
-
 }
 
 };
