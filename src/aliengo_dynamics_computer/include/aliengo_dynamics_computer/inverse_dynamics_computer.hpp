@@ -66,10 +66,6 @@ private:
     
     std::vector<FrameIndex> contact_pt_ids_; //!< Id of the contact frames if they exist.
 
-    const int MAX_DATA_BUFFER_SIZE = 5; //!< buffer size
-
-    boost::circular_buffer<Data> robot_data_buffer_; //!< Variable to store previous data values for later use
-
     bool odom_available_ = false; //!< Variable to indicate if the odom data has be received
     
     bool joint_data_available_ = false; //!< Variable to indicate if the joint states has be received
@@ -82,13 +78,23 @@ private:
      */
     struct robotDynamicsData{
 
+        const int MAX_DATA_BUFFER_SIZE = 5; //!< buffer size
+
         bool dynamics_data_updated_ = false;
+
+        int data_counter_ = 0; //<! variable to track if the buffer is filled with proper data
 
         Eigen::VectorXd joint_q_; //!< joint position vector excluding base
 
         Eigen::VectorXd joint_q_dot_; //!< joint velocity vector excluding base
 
         Eigen::VectorXd joint_torque_; //!< joint torque vector excluding base
+
+        boost::circular_buffer<Eigen::VectorXd> joint_q_buffer_; //!< buffer to store joint positions
+
+        boost::circular_buffer<Eigen::VectorXd> joint_q_dot_buffer_; //!< buffer to store joint velocity
+
+        boost::circular_buffer<Eigen::VectorXd> joint_torque_buffer_; //!< buffer to store joint torque
 
         /**
          * @brief Constructor
@@ -98,9 +104,14 @@ private:
        {
         //initialize the variable size. Hardcoding the size for now
 		//3 DOF per leg * 4 leg = 12 DOF total
-		joint_q_ = Eigen::VectorXd(12);
-		joint_q_dot_ = Eigen::VectorXd(12);
-		joint_torque_ = Eigen::VectorXd(12);
+        //initialize to zero for easy computation of average value
+		joint_q_ = Eigen::VectorXd::Zero(12);
+		joint_q_dot_ = Eigen::VectorXd::Zero(12);
+		joint_torque_ = Eigen::VectorXd::Zero(12);
+        //resize the ring buffer
+        joint_q_buffer_.resize(MAX_DATA_BUFFER_SIZE);
+        joint_q_dot_buffer_.resize(MAX_DATA_BUFFER_SIZE);
+        joint_torque_buffer_.resize(MAX_DATA_BUFFER_SIZE);
        }
         
         /**
@@ -112,6 +123,12 @@ private:
          * @return none.
          */
         void update(sensor_msgs::JointState joint_data, Model robot_model);
+
+        /**
+         * @brief Function to average the values from #joint_q_buffer_, #joint_q_dot_buffer_, #joint_torque_buffer_
+         * 
+        */
+        void averageData();
 
     };
 

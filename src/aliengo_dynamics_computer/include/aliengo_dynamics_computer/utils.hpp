@@ -11,7 +11,7 @@ public:
 /**
 	* @brief Function to extract the force values for each leg
 	* 
-	* @param contact_points - name of the #contact_points_ to be used for header frames
+	* @param contact_points - name of the contact_points to be used for header frames
 	* @param forces - vector with force in x,y,z direction for each leg
 	* @param print_debug - enable print statements. Turned off by default
 	*
@@ -73,9 +73,9 @@ Eigen::VectorXd poseToVector(geometry_msgs::Pose msg)
 /**
  * @brief Function to convert from geometry_msgs::Pose to Eigen::VectorXd
  * 
- * @param msg - input pose message
+ * @param vec - input vector message
  * 
- * @return Eigen::VectorXd - converted message
+ * @return std::vector<float> - converted stl vector message message
  */
 std::vector<float> eigenToStlVector(Eigen::VectorXd vec)
 {

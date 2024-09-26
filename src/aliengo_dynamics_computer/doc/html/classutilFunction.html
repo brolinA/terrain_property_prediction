@@ -32,6 +32,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:aa7b8684da932d39ba6740dbbc9244341"><td class="memItemLeft" align="right" valign="top">Eigen::Vector4d&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classutilFunction.html#aa7b8684da932d39ba6740dbbc9244341">computeForcePerLeg</a> (std::vector&lt; std::string &gt; contact_points, Eigen::VectorXd forces, bool print_debug=false)</td></tr>
 <tr class="memdesc:aa7b8684da932d39ba6740dbbc9244341"><td class="mdescLeft">&#160;</td><td class="mdescRight">Function to extract the force values for each leg.  <a href="classutilFunction.html#aa7b8684da932d39ba6740dbbc9244341">More...</a><br /></td></tr>
 <tr class="separator:aa7b8684da932d39ba6740dbbc9244341"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a779b703964a96739683a3dd057aa52df"><td class="memItemLeft" align="right" valign="top">std::vector&lt; float &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classutilFunction.html#a779b703964a96739683a3dd057aa52df">eigenToStlVector</a> (Eigen::VectorXd vec)</td></tr>
+<tr class="memdesc:a779b703964a96739683a3dd057aa52df"><td class="mdescLeft">&#160;</td><td class="mdescRight">Function to convert from geometry_msgs::Pose to Eigen::VectorXd.  <a href="classutilFunction.html#a779b703964a96739683a3dd057aa52df">More...</a><br /></td></tr>
+<tr class="separator:a779b703964a96739683a3dd057aa52df"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1c2a4abfc18f2926b72a389881dee2a9"><td class="memItemLeft" align="right" valign="top">Eigen::VectorXd&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classutilFunction.html#a1c2a4abfc18f2926b72a389881dee2a9">poseToVector</a> (geometry_msgs::Pose msg)</td></tr>
 <tr class="memdesc:a1c2a4abfc18f2926b72a389881dee2a9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Function to convert from geometry_msgs::Pose to Eigen::VectorXd.  <a href="classutilFunction.html#a1c2a4abfc18f2926b72a389881dee2a9">More...</a><br /></td></tr>
 <tr class="separator:a1c2a4abfc18f2926b72a389881dee2a9"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -89,7 +92,7 @@ Public Member Functions</h2></td></tr>
 <p>Function to extract the force values for each leg. </p>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
-    <tr><td class="paramname">contact_points</td><td>- name of the #contact_points_ to be used for header frames </td></tr>
+    <tr><td class="paramname">contact_points</td><td>- name of the contact_points to be used for header frames </td></tr>
     <tr><td class="paramname">forces</td><td>- vector with force in x,y,z direction for each leg </td></tr>
     <tr><td class="paramname">print_debug</td><td>- enable print statements. Turned off by default</td></tr>
   </table>
@@ -98,6 +101,43 @@ Public Member Functions</h2></td></tr>
 <dl class="section return"><dt>Returns</dt><dd>Eigen::Vector4d - Vector of shape 4x1 having the magnitude of force in each leg </dd></dl>
 
 <p class="definition">Definition at line <a class="el" href="utils_8hpp_source.html#l00020">20</a> of file <a class="el" href="utils_8hpp_source.html">utils.hpp</a>.</p>
+
+</div>
+</div>
+<a id="a779b703964a96739683a3dd057aa52df"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a779b703964a96739683a3dd057aa52df">&#9670;&nbsp;</a></span>eigenToStlVector()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">std::vector&lt;float&gt; utilFunction::eigenToStlVector </td>
+          <td>(</td>
+          <td class="paramtype">Eigen::VectorXd&#160;</td>
+          <td class="paramname"><em>vec</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Function to convert from geometry_msgs::Pose to Eigen::VectorXd. </p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">vec</td><td>- input vector message</td></tr>
+  </table>
+  </dd>
+</dl>
+<dl class="section return"><dt>Returns</dt><dd>std::vector&lt;float&gt; - converted stl vector message message </dd></dl>
+
+<p class="definition">Definition at line <a class="el" href="utils_8hpp_source.html#l00080">80</a> of file <a class="el" href="utils_8hpp_source.html">utils.hpp</a>.</p>
 
 </div>
 </div>
@@ -226,7 +266,7 @@ Public Member Functions</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>none </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="utils_8hpp_source.html#l00082">82</a> of file <a class="el" href="utils_8hpp_source.html">utils.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="utils_8hpp_source.html#l00096">96</a> of file <a class="el" href="utils_8hpp_source.html">utils.hpp</a>.</p>
 
 </div>
 </div>
@@ -239,7 +279,7 @@ Public Member Functions</h2></td></tr>
 <hr size="1"><div style="align: right;">
 <a href="http://wiki.ros.org/aliengo_dynamics_computer">aliengo_dynamics_computer</a><br />
 Author(s): Brolin</br />
-<small>autogenerated on Wed Sep 25 2024 14:55:45</small>
+<small>autogenerated on Thu Sep 26 2024 16:41:08</small>
 </div>
 </body>
 </html>

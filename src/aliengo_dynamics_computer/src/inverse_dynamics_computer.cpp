@@ -31,8 +31,7 @@ void computeInverseDynamics::createModelAndData(std::string urdf_path)
   pinocchio::urdf::buildModel(urdf_path, pinocchio::JointModelFreeFlyer(), robot_model_);
   
   robot_data_ = Data(robot_model_);
-	robot_data_buffer_.resize(MAX_DATA_BUFFER_SIZE); //setting the size of the buffer - currently not used
-
+	
 	//initialize the vector size
 	q_ = Eigen::VectorXd(robot_model_.nq);
 	q_dot_ = Eigen::VectorXd(robot_model_.nv);
@@ -92,6 +91,7 @@ void computeInverseDynamics::robotDynamicsData::update(sensor_msgs::JointState j
 {
 	std::vector<std::string> ros_joint_names = joint_data.name; //name of the joints available in 
 	int row_number=0; //row number to insert the value
+	Eigen::VectorXd q(12), q_dot(12), torque(12);
 
 	//use the joint name from the pinocchio model to order the joint vector since the order follows the URDF tree
 	for(auto model_joint_name:robot_model.names)
@@ -103,12 +103,35 @@ void computeInverseDynamics::robotDynamicsData::update(sensor_msgs::JointState j
 		if(it != ros_joint_names.end())
 		{
 			int idx = it - ros_joint_names.begin(); //index value of the array
-			joint_q_(row_number,0) = joint_data.position[idx];
-			joint_q_dot_(row_number,0) = joint_data.velocity[idx];
-			joint_torque_(row_number,0) = joint_data.effort[idx];
+			q(row_number,0) = joint_data.position[idx];
+			q_dot(row_number,0) = joint_data.velocity[idx];
+			torque(row_number,0) = joint_data.effort[idx];
 			row_number++;
 		}
 	}
+	joint_q_buffer_.push_back(q);
+	joint_q_dot_buffer_.push_back(q_dot);
+	joint_torque_buffer_.push_back(torque);
+	data_counter_++;
+
+	if(data_counter_ >= MAX_DATA_BUFFER_SIZE)
+		averageData();
+
+}
+
+void computeInverseDynamics::robotDynamicsData::averageData()
+{
+	//cycle through the variable and sum them
+	for (int i=0; i<MAX_DATA_BUFFER_SIZE; i++)
+	{
+		joint_q_ += joint_q_buffer_[i];
+		joint_q_dot_ += joint_q_dot_buffer_[i];
+		joint_torque_ += joint_torque_buffer_[i];
+	}
+
+	joint_q_ /= MAX_DATA_BUFFER_SIZE;
+	joint_q_dot_ /= MAX_DATA_BUFFER_SIZE;
+	joint_torque_ /= MAX_DATA_BUFFER_SIZE;
 
 	dynamics_data_updated_ = true;
 }
@@ -122,9 +145,6 @@ void computeInverseDynamics::odometryCallback(const nav_msgs::Odometry::ConstPtr
 		q_dot_ << util_func_.twistToVector(odom_data->twist.twist), robot_dynamic_data_.joint_q_dot_;
 		torque_ << 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, robot_dynamic_data_.joint_torque_; //using 0 for torque on body
 
-		// odom_available_ = true;
-		robot_dynamic_data_.dynamics_data_updated_ = false;
-		
 		//Debug prints
 		// std::cout << "q: " << q_.transpose() << std::endl;
 		// std::cout << "q_dot: " << q_dot_.transpose() << std::endl;
@@ -136,8 +156,9 @@ void computeInverseDynamics::odometryCallback(const nav_msgs::Odometry::ConstPtr
 		pin_debug.joint_velocity = util_func_.eigenToStlVector(q_dot_);
 		pin_debug.joint_torque = util_func_.eigenToStlVector(torque_);
 		pinocchio_debug_pub_.publish(pin_debug);
+
+		computeFootForce(); //computer force on each foot using inverse dynamics
 	}
-	computeFootForce(); //computer force on each foot using inverse dynamics
 }
 
 void computeInverseDynamics::computeFootForce()

@@ -74,31 +74,39 @@ $(function() {
 <div class="line"><a name="l00070"></a><span class="lineno">   70</span>&#160;        <span class="keywordflow">return</span> pos_vec;</div>
 <div class="line"><a name="l00071"></a><span class="lineno">   71</span>&#160;}</div>
 <div class="line"><a name="l00072"></a><span class="lineno">   72</span>&#160; </div>
-<div class="line"><a name="l00082"></a><span class="lineno"><a class="line" href="classutilFunction.html#a4fe41df61e82d4b86f1303e38fcd0ff5">   82</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classutilFunction.html#a4fe41df61e82d4b86f1303e38fcd0ff5">vectorToForceMsg</a>(std::vector&lt;std::string&gt; contact_points, Eigen::VectorXd force_vector, aliengo_dynamics_computer::ReactionForce&amp; leg_forces)</div>
-<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;{</div>
-<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;        geometry_msgs::WrenchStamped single_leg_force;</div>
-<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;        single_leg_force.header.stamp = ros::Time().now();</div>
+<div class="line"><a name="l00080"></a><span class="lineno"><a class="line" href="classutilFunction.html#a779b703964a96739683a3dd057aa52df">   80</a></span>&#160;std::vector&lt;float&gt; <a class="code" href="classutilFunction.html#a779b703964a96739683a3dd057aa52df">eigenToStlVector</a>(Eigen::VectorXd vec)</div>
+<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;{</div>
+<div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;        <span class="comment">// std::vector&lt;float&gt; stl_vec;</span></div>
+<div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;        std::vector&lt;float&gt; stl_vec(vec.data(), vec.data() + vec.rows() * vec.cols());</div>
+<div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;        <span class="keywordflow">return</span> stl_vec;</div>
+<div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;}</div>
 <div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160; </div>
-<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;        <span class="keywordtype">int</span> vector_pos = 0; <span class="comment">//vector position</span></div>
-<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;        <span class="keywordflow">for</span>(<span class="keyword">auto</span> contact_pt:contact_points)</div>
-<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;        {</div>
-<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;                <span class="comment">//this frame doesn&#39;t exist in ROS. But refers to the frame in the pinocchio model</span></div>
-<div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160;                single_leg_force.header.frame_id = contact_pt;</div>
-<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160; </div>
-<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;                Eigen::Vector3d force_component = force_vector.block(vector_pos, 0, 3, 1);</div>
-<div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160; </div>
-<div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;                single_leg_force.wrench.force.x = force_component(0,0);</div>
-<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;                single_leg_force.wrench.force.y = force_component(1,0);</div>
-<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;                single_leg_force.wrench.force.z = force_component(2,0);</div>
-<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160; </div>
-<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;                leg_forces.reaction_forces.push_back(single_leg_force);</div>
-<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160;        }</div>
-<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;}</div>
-<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160; </div>
-<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;};</div>
-<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;<span class="preprocessor">#endif //UTILS_HPP</span></div>
+<div class="line"><a name="l00096"></a><span class="lineno"><a class="line" href="classutilFunction.html#a4fe41df61e82d4b86f1303e38fcd0ff5">   96</a></span>&#160;<span class="keywordtype">void</span> <a class="code" href="classutilFunction.html#a4fe41df61e82d4b86f1303e38fcd0ff5">vectorToForceMsg</a>(std::vector&lt;std::string&gt; contact_points, Eigen::VectorXd force_vector, aliengo_dynamics_computer::ReactionForce&amp; leg_forces)</div>
+<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;{</div>
+<div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160;        geometry_msgs::WrenchStamped single_leg_force;</div>
+<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;        single_leg_force.header.stamp = ros::Time().now();</div>
+<div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160; </div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;        <span class="keywordtype">int</span> vector_pos = 0; <span class="comment">//vector position</span></div>
+<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;        <span class="keywordflow">for</span>(<span class="keyword">auto</span> contact_pt:contact_points)</div>
+<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;        {</div>
+<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;                <span class="comment">//this frame doesn&#39;t exist in ROS. But refers to the frame in the pinocchio model</span></div>
+<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;                single_leg_force.header.frame_id = contact_pt;</div>
+<div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160; </div>
+<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;                Eigen::Vector3d force_component = force_vector.block(vector_pos, 0, 3, 1);</div>
+<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160; </div>
+<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;                single_leg_force.wrench.force.x = force_component(0,0);</div>
+<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;                single_leg_force.wrench.force.y = force_component(1,0);</div>
+<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;                single_leg_force.wrench.force.z = force_component(2,0);</div>
+<div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160; </div>
+<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;                leg_forces.reaction_forces.push_back(single_leg_force);</div>
+<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;        }</div>
+<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;}</div>
+<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160; </div>
+<div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160;};</div>
+<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;<span class="preprocessor">#endif //UTILS_HPP</span></div>
 </div><!-- fragment --></div><!-- contents -->
-<div class="ttc" id="aclassutilFunction_html_a4fe41df61e82d4b86f1303e38fcd0ff5"><div class="ttname"><a href="classutilFunction.html#a4fe41df61e82d4b86f1303e38fcd0ff5">utilFunction::vectorToForceMsg</a></div><div class="ttdeci">void vectorToForceMsg(std::vector&lt; std::string &gt; contact_points, Eigen::VectorXd force_vector, aliengo_dynamics_computer::ReactionForce &amp;leg_forces)</div><div class="ttdoc">Function to extract component forces in x,y,z direction from force vector.</div><div class="ttdef"><b>Definition:</b> <a href="utils_8hpp_source.html#l00082">utils.hpp:82</a></div></div>
+<div class="ttc" id="aclassutilFunction_html_a4fe41df61e82d4b86f1303e38fcd0ff5"><div class="ttname"><a href="classutilFunction.html#a4fe41df61e82d4b86f1303e38fcd0ff5">utilFunction::vectorToForceMsg</a></div><div class="ttdeci">void vectorToForceMsg(std::vector&lt; std::string &gt; contact_points, Eigen::VectorXd force_vector, aliengo_dynamics_computer::ReactionForce &amp;leg_forces)</div><div class="ttdoc">Function to extract component forces in x,y,z direction from force vector.</div><div class="ttdef"><b>Definition:</b> <a href="utils_8hpp_source.html#l00096">utils.hpp:96</a></div></div>
+<div class="ttc" id="aclassutilFunction_html_a779b703964a96739683a3dd057aa52df"><div class="ttname"><a href="classutilFunction.html#a779b703964a96739683a3dd057aa52df">utilFunction::eigenToStlVector</a></div><div class="ttdeci">std::vector&lt; float &gt; eigenToStlVector(Eigen::VectorXd vec)</div><div class="ttdoc">Function to convert from geometry_msgs::Pose to Eigen::VectorXd.</div><div class="ttdef"><b>Definition:</b> <a href="utils_8hpp_source.html#l00080">utils.hpp:80</a></div></div>
 <div class="ttc" id="aclassutilFunction_html_a1c2a4abfc18f2926b72a389881dee2a9"><div class="ttname"><a href="classutilFunction.html#a1c2a4abfc18f2926b72a389881dee2a9">utilFunction::poseToVector</a></div><div class="ttdeci">Eigen::VectorXd poseToVector(geometry_msgs::Pose msg)</div><div class="ttdoc">Function to convert from geometry_msgs::Pose to Eigen::VectorXd.</div><div class="ttdef"><b>Definition:</b> <a href="utils_8hpp_source.html#l00064">utils.hpp:64</a></div></div>
 <div class="ttc" id="aclassutilFunction_html_aa7b8684da932d39ba6740dbbc9244341"><div class="ttname"><a href="classutilFunction.html#aa7b8684da932d39ba6740dbbc9244341">utilFunction::computeForcePerLeg</a></div><div class="ttdeci">Eigen::Vector4d computeForcePerLeg(std::vector&lt; std::string &gt; contact_points, Eigen::VectorXd forces, bool print_debug=false)</div><div class="ttdoc">Function to extract the force values for each leg.</div><div class="ttdef"><b>Definition:</b> <a href="utils_8hpp_source.html#l00020">utils.hpp:20</a></div></div>
 <div class="ttc" id="aclassutilFunction_html_a84c76c46d027e5ce21585668edbba202"><div class="ttname"><a href="classutilFunction.html#a84c76c46d027e5ce21585668edbba202">utilFunction::twistToVector</a></div><div class="ttdeci">Eigen::VectorXd twistToVector(geometry_msgs::Twist msg)</div><div class="ttdoc">Function to convert from geometry_msgs::Twist to Eigen::VectorXd.</div><div class="ttdef"><b>Definition:</b> <a href="utils_8hpp_source.html#l00048">utils.hpp:48</a></div></div>
@@ -108,7 +116,7 @@ $(function() {
 <hr size="1"><div style="align: right;">
 <a href="http://wiki.ros.org/aliengo_dynamics_computer">aliengo_dynamics_computer</a><br />
 Author(s): Brolin</br />
-<small>autogenerated on Wed Sep 25 2024 14:55:45</small>
+<small>autogenerated on Thu Sep 26 2024 16:41:08</small>
 </div>
 </body>
 </html>

@@ -32,31 +32,100 @@ $(function() {
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
+<tr class="memitem:a1c5b5663c7d332c934a192e7ca0e1b60"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcomputeInverseDynamics_1_1robotDynamicsData.html#a1c5b5663c7d332c934a192e7ca0e1b60">averageData</a> ()</td></tr>
+<tr class="memdesc:a1c5b5663c7d332c934a192e7ca0e1b60"><td class="mdescLeft">&#160;</td><td class="mdescRight">Function to average the values from <a class="el" href="structcomputeInverseDynamics_1_1robotDynamicsData.html#a3bc9df8941c506ed6f0a8f424061cedd" title="buffer to store joint positions">joint_q_buffer_</a>, <a class="el" href="structcomputeInverseDynamics_1_1robotDynamicsData.html#a017eff3524903ae4281f84a115f035ea" title="buffer to store joint velocity">joint_q_dot_buffer_</a>, <a class="el" href="structcomputeInverseDynamics_1_1robotDynamicsData.html#a9c102ce7adb789446efab5b325524d43" title="buffer to store joint torque">joint_torque_buffer_</a>.  <a href="structcomputeInverseDynamics_1_1robotDynamicsData.html#a1c5b5663c7d332c934a192e7ca0e1b60">More...</a><br /></td></tr>
+<tr class="separator:a1c5b5663c7d332c934a192e7ca0e1b60"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a45dca57cfc13a28222722186b1e55d60"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcomputeInverseDynamics_1_1robotDynamicsData.html#a45dca57cfc13a28222722186b1e55d60">robotDynamicsData</a> ()</td></tr>
+<tr class="memdesc:a45dca57cfc13a28222722186b1e55d60"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor.  <a href="structcomputeInverseDynamics_1_1robotDynamicsData.html#a45dca57cfc13a28222722186b1e55d60">More...</a><br /></td></tr>
+<tr class="separator:a45dca57cfc13a28222722186b1e55d60"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aeaabfe52ed7f554f34f964aa5e5c70c1"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcomputeInverseDynamics_1_1robotDynamicsData.html#aeaabfe52ed7f554f34f964aa5e5c70c1">update</a> (sensor_msgs::JointState joint_data, Model robot_model)</td></tr>
 <tr class="memdesc:aeaabfe52ed7f554f34f964aa5e5c70c1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Function to the joint data to the vectors.  <a href="structcomputeInverseDynamics_1_1robotDynamicsData.html#aeaabfe52ed7f554f34f964aa5e5c70c1">More...</a><br /></td></tr>
 <tr class="separator:aeaabfe52ed7f554f34f964aa5e5c70c1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
+<tr class="memitem:af45a11b8d776743ac52dd6a32f23296b"><td class="memItemLeft" align="right" valign="top">int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcomputeInverseDynamics_1_1robotDynamicsData.html#af45a11b8d776743ac52dd6a32f23296b">data_counter_</a> = 0</td></tr>
+<tr class="separator:af45a11b8d776743ac52dd6a32f23296b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6a119ca4af78caa19c21291517afc642"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcomputeInverseDynamics_1_1robotDynamicsData.html#a6a119ca4af78caa19c21291517afc642">dynamics_data_updated_</a> = false</td></tr>
 <tr class="separator:a6a119ca4af78caa19c21291517afc642"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3b9c472a72c60375e989a4ff5bf44e4f"><td class="memItemLeft" align="right" valign="top">Eigen::VectorXd&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcomputeInverseDynamics_1_1robotDynamicsData.html#a3b9c472a72c60375e989a4ff5bf44e4f">joint_q_</a></td></tr>
 <tr class="memdesc:a3b9c472a72c60375e989a4ff5bf44e4f"><td class="mdescLeft">&#160;</td><td class="mdescRight">joint position vector excluding base  <a href="structcomputeInverseDynamics_1_1robotDynamicsData.html#a3b9c472a72c60375e989a4ff5bf44e4f">More...</a><br /></td></tr>
 <tr class="separator:a3b9c472a72c60375e989a4ff5bf44e4f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3bc9df8941c506ed6f0a8f424061cedd"><td class="memItemLeft" align="right" valign="top">boost::circular_buffer&lt; Eigen::VectorXd &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcomputeInverseDynamics_1_1robotDynamicsData.html#a3bc9df8941c506ed6f0a8f424061cedd">joint_q_buffer_</a></td></tr>
+<tr class="memdesc:a3bc9df8941c506ed6f0a8f424061cedd"><td class="mdescLeft">&#160;</td><td class="mdescRight">buffer to store joint positions  <a href="structcomputeInverseDynamics_1_1robotDynamicsData.html#a3bc9df8941c506ed6f0a8f424061cedd">More...</a><br /></td></tr>
+<tr class="separator:a3bc9df8941c506ed6f0a8f424061cedd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a9b9a6d38cce980b902088543955452a0"><td class="memItemLeft" align="right" valign="top">Eigen::VectorXd&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcomputeInverseDynamics_1_1robotDynamicsData.html#a9b9a6d38cce980b902088543955452a0">joint_q_dot_</a></td></tr>
 <tr class="memdesc:a9b9a6d38cce980b902088543955452a0"><td class="mdescLeft">&#160;</td><td class="mdescRight">joint velocity vector excluding base  <a href="structcomputeInverseDynamics_1_1robotDynamicsData.html#a9b9a6d38cce980b902088543955452a0">More...</a><br /></td></tr>
 <tr class="separator:a9b9a6d38cce980b902088543955452a0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a017eff3524903ae4281f84a115f035ea"><td class="memItemLeft" align="right" valign="top">boost::circular_buffer&lt; Eigen::VectorXd &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcomputeInverseDynamics_1_1robotDynamicsData.html#a017eff3524903ae4281f84a115f035ea">joint_q_dot_buffer_</a></td></tr>
+<tr class="memdesc:a017eff3524903ae4281f84a115f035ea"><td class="mdescLeft">&#160;</td><td class="mdescRight">buffer to store joint velocity  <a href="structcomputeInverseDynamics_1_1robotDynamicsData.html#a017eff3524903ae4281f84a115f035ea">More...</a><br /></td></tr>
+<tr class="separator:a017eff3524903ae4281f84a115f035ea"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8117efe8992fbb1f4437a93437585536"><td class="memItemLeft" align="right" valign="top">Eigen::VectorXd&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcomputeInverseDynamics_1_1robotDynamicsData.html#a8117efe8992fbb1f4437a93437585536">joint_torque_</a></td></tr>
 <tr class="memdesc:a8117efe8992fbb1f4437a93437585536"><td class="mdescLeft">&#160;</td><td class="mdescRight">joint torque vector excluding base  <a href="structcomputeInverseDynamics_1_1robotDynamicsData.html#a8117efe8992fbb1f4437a93437585536">More...</a><br /></td></tr>
 <tr class="separator:a8117efe8992fbb1f4437a93437585536"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a645f3e8d67bdc8aedb2841f763764cb3"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcomputeInverseDynamics_1_1robotDynamicsData.html#a645f3e8d67bdc8aedb2841f763764cb3">size_initialized_</a> = false</td></tr>
-<tr class="separator:a645f3e8d67bdc8aedb2841f763764cb3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9c102ce7adb789446efab5b325524d43"><td class="memItemLeft" align="right" valign="top">boost::circular_buffer&lt; Eigen::VectorXd &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcomputeInverseDynamics_1_1robotDynamicsData.html#a9c102ce7adb789446efab5b325524d43">joint_torque_buffer_</a></td></tr>
+<tr class="memdesc:a9c102ce7adb789446efab5b325524d43"><td class="mdescLeft">&#160;</td><td class="mdescRight">buffer to store joint torque  <a href="structcomputeInverseDynamics_1_1robotDynamicsData.html#a9c102ce7adb789446efab5b325524d43">More...</a><br /></td></tr>
+<tr class="separator:a9c102ce7adb789446efab5b325524d43"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac826fa729f211b1fdf997404d5f93029"><td class="memItemLeft" align="right" valign="top">const int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structcomputeInverseDynamics_1_1robotDynamicsData.html#ac826fa729f211b1fdf997404d5f93029">MAX_DATA_BUFFER_SIZE</a> = 5</td></tr>
+<tr class="memdesc:ac826fa729f211b1fdf997404d5f93029"><td class="mdescLeft">&#160;</td><td class="mdescRight">buffer size  <a href="structcomputeInverseDynamics_1_1robotDynamicsData.html#ac826fa729f211b1fdf997404d5f93029">More...</a><br /></td></tr>
+<tr class="separator:ac826fa729f211b1fdf997404d5f93029"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>struct to hold dynamics data required by pinocchio for computation </p>
 
-<p class="definition">Definition at line <a class="el" href="inverse__dynamics__computer_8hpp_source.html#l00081">81</a> of file <a class="el" href="inverse__dynamics__computer_8hpp_source.html">inverse_dynamics_computer.hpp</a>.</p>
-</div><h2 class="groupheader">Member Function Documentation</h2>
+<p class="definition">Definition at line <a class="el" href="inverse__dynamics__computer_8hpp_source.html#l00079">79</a> of file <a class="el" href="inverse__dynamics__computer_8hpp_source.html">inverse_dynamics_computer.hpp</a>.</p>
+</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a id="a45dca57cfc13a28222722186b1e55d60"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a45dca57cfc13a28222722186b1e55d60">&#9670;&nbsp;</a></span>robotDynamicsData()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">computeInverseDynamics::robotDynamicsData::robotDynamicsData </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+<p>Constructor. </p>
+
+<p class="definition">Definition at line <a class="el" href="inverse__dynamics__computer_8hpp_source.html#l00103">103</a> of file <a class="el" href="inverse__dynamics__computer_8hpp_source.html">inverse_dynamics_computer.hpp</a>.</p>
+
+</div>
+</div>
+<h2 class="groupheader">Member Function Documentation</h2>
+<a id="a1c5b5663c7d332c934a192e7ca0e1b60"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a1c5b5663c7d332c934a192e7ca0e1b60">&#9670;&nbsp;</a></span>averageData()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void computeInverseDynamics::robotDynamicsData::averageData </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Function to average the values from <a class="el" href="structcomputeInverseDynamics_1_1robotDynamicsData.html#a3bc9df8941c506ed6f0a8f424061cedd" title="buffer to store joint positions">joint_q_buffer_</a>, <a class="el" href="structcomputeInverseDynamics_1_1robotDynamicsData.html#a017eff3524903ae4281f84a115f035ea" title="buffer to store joint velocity">joint_q_dot_buffer_</a>, <a class="el" href="structcomputeInverseDynamics_1_1robotDynamicsData.html#a9c102ce7adb789446efab5b325524d43" title="buffer to store joint torque">joint_torque_buffer_</a>. </p>
+
+<p class="definition">Definition at line <a class="el" href="inverse__dynamics__computer_8cpp_source.html#l00122">122</a> of file <a class="el" href="inverse__dynamics__computer_8cpp_source.html">inverse_dynamics_computer.cpp</a>.</p>
+
+</div>
+</div>
 <a id="aeaabfe52ed7f554f34f964aa5e5c70c1"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#aeaabfe52ed7f554f34f964aa5e5c70c1">&#9670;&nbsp;</a></span>update()</h2>
 
@@ -93,11 +162,27 @@ Public Attributes</h2></td></tr>
 </dl>
 <dl class="section return"><dt>Returns</dt><dd>none. </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="inverse__dynamics__computer_8cpp_source.html#l00098">98</a> of file <a class="el" href="inverse__dynamics__computer_8cpp_source.html">inverse_dynamics_computer.cpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="inverse__dynamics__computer_8cpp_source.html#l00090">90</a> of file <a class="el" href="inverse__dynamics__computer_8cpp_source.html">inverse_dynamics_computer.cpp</a>.</p>
 
 </div>
 </div>
 <h2 class="groupheader">Member Data Documentation</h2>
+<a id="af45a11b8d776743ac52dd6a32f23296b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#af45a11b8d776743ac52dd6a32f23296b">&#9670;&nbsp;</a></span>data_counter_</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">int computeInverseDynamics::robotDynamicsData::data_counter_ = 0</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="inverse__dynamics__computer_8hpp_source.html#l00085">85</a> of file <a class="el" href="inverse__dynamics__computer_8hpp_source.html">inverse_dynamics_computer.hpp</a>.</p>
+
+</div>
+</div>
 <a id="a6a119ca4af78caa19c21291517afc642"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a6a119ca4af78caa19c21291517afc642">&#9670;&nbsp;</a></span>dynamics_data_updated_</h2>
 
@@ -110,7 +195,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="inverse__dynamics__computer_8hpp_source.html#l00085">85</a> of file <a class="el" href="inverse__dynamics__computer_8hpp_source.html">inverse_dynamics_computer.hpp</a>.</p>
+<p class="definition">Definition at line <a class="el" href="inverse__dynamics__computer_8hpp_source.html#l00083">83</a> of file <a class="el" href="inverse__dynamics__computer_8hpp_source.html">inverse_dynamics_computer.hpp</a>.</p>
 
 </div>
 </div>
@@ -132,6 +217,24 @@ Public Attributes</h2></td></tr>
 
 </div>
 </div>
+<a id="a3bc9df8941c506ed6f0a8f424061cedd"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3bc9df8941c506ed6f0a8f424061cedd">&#9670;&nbsp;</a></span>joint_q_buffer_</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">boost::circular_buffer&lt;Eigen::VectorXd&gt; computeInverseDynamics::robotDynamicsData::joint_q_buffer_</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>buffer to store joint positions </p>
+
+<p class="definition">Definition at line <a class="el" href="inverse__dynamics__computer_8hpp_source.html#l00093">93</a> of file <a class="el" href="inverse__dynamics__computer_8hpp_source.html">inverse_dynamics_computer.hpp</a>.</p>
+
+</div>
+</div>
 <a id="a9b9a6d38cce980b902088543955452a0"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a9b9a6d38cce980b902088543955452a0">&#9670;&nbsp;</a></span>joint_q_dot_</h2>
 
@@ -147,6 +250,24 @@ Public Attributes</h2></td></tr>
 <p>joint velocity vector excluding base </p>
 
 <p class="definition">Definition at line <a class="el" href="inverse__dynamics__computer_8hpp_source.html#l00089">89</a> of file <a class="el" href="inverse__dynamics__computer_8hpp_source.html">inverse_dynamics_computer.hpp</a>.</p>
+
+</div>
+</div>
+<a id="a017eff3524903ae4281f84a115f035ea"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a017eff3524903ae4281f84a115f035ea">&#9670;&nbsp;</a></span>joint_q_dot_buffer_</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">boost::circular_buffer&lt;Eigen::VectorXd&gt; computeInverseDynamics::robotDynamicsData::joint_q_dot_buffer_</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>buffer to store joint velocity </p>
+
+<p class="definition">Definition at line <a class="el" href="inverse__dynamics__computer_8hpp_source.html#l00095">95</a> of file <a class="el" href="inverse__dynamics__computer_8hpp_source.html">inverse_dynamics_computer.hpp</a>.</p>
 
 </div>
 </div>
@@ -168,19 +289,39 @@ Public Attributes</h2></td></tr>
 
 </div>
 </div>
-<a id="a645f3e8d67bdc8aedb2841f763764cb3"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a645f3e8d67bdc8aedb2841f763764cb3">&#9670;&nbsp;</a></span>size_initialized_</h2>
+<a id="a9c102ce7adb789446efab5b325524d43"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9c102ce7adb789446efab5b325524d43">&#9670;&nbsp;</a></span>joint_torque_buffer_</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">bool computeInverseDynamics::robotDynamicsData::size_initialized_ = false</td>
+          <td class="memname">boost::circular_buffer&lt;Eigen::VectorXd&gt; computeInverseDynamics::robotDynamicsData::joint_torque_buffer_</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="inverse__dynamics__computer_8hpp_source.html#l00083">83</a> of file <a class="el" href="inverse__dynamics__computer_8hpp_source.html">inverse_dynamics_computer.hpp</a>.</p>
+<p>buffer to store joint torque </p>
+
+<p class="definition">Definition at line <a class="el" href="inverse__dynamics__computer_8hpp_source.html#l00097">97</a> of file <a class="el" href="inverse__dynamics__computer_8hpp_source.html">inverse_dynamics_computer.hpp</a>.</p>
+
+</div>
+</div>
+<a id="ac826fa729f211b1fdf997404d5f93029"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac826fa729f211b1fdf997404d5f93029">&#9670;&nbsp;</a></span>MAX_DATA_BUFFER_SIZE</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">const int computeInverseDynamics::robotDynamicsData::MAX_DATA_BUFFER_SIZE = 5</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>buffer size </p>
+
+<p class="definition">Definition at line <a class="el" href="inverse__dynamics__computer_8hpp_source.html#l00081">81</a> of file <a class="el" href="inverse__dynamics__computer_8hpp_source.html">inverse_dynamics_computer.hpp</a>.</p>
 
 </div>
 </div>
@@ -194,7 +335,7 @@ Public Attributes</h2></td></tr>
 <hr size="1"><div style="align: right;">
 <a href="http://wiki.ros.org/aliengo_dynamics_computer">aliengo_dynamics_computer</a><br />
 Author(s): Brolin</br />
-<small>autogenerated on Wed Sep 25 2024 14:55:45</small>
+<small>autogenerated on Thu Sep 26 2024 16:41:08</small>
 </div>
 </body>
 </html>

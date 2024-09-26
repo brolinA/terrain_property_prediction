@@ -3,23 +3,24 @@ authors: Brolin
 brief: ''
 bugtracker: ''
 depends:
-- message_filters
+- std_msgs
+- tf2
 - pinocchio
-- catkin
-- message_filteres
-- tf2_ros
-- message_generation
-- rospy
 - message_runtime
 - geometry_msgs
+- rospy
 - sensor_msgs
-- tf2
 - roscpp
-- std_msgs
+- message_filters
+- message_filteres
+- message_generation
+- catkin
+- tf2_ros
 description: The aliengo_dynamics_computer package
 license: MIT
 maintainers: Brolin <Brolin@todo.todo>
 msgs:
+- PinocchioDebug
 - ReactionForce
 - FootForces
 package_type: package
