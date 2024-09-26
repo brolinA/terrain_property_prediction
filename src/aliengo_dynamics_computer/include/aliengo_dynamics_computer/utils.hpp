@@ -71,6 +71,20 @@ Eigen::VectorXd poseToVector(geometry_msgs::Pose msg)
 }
 
 /**
+ * @brief Function to convert from geometry_msgs::Pose to Eigen::VectorXd
+ * 
+ * @param msg - input pose message
+ * 
+ * @return Eigen::VectorXd - converted message
+ */
+std::vector<float> eigenToStlVector(Eigen::VectorXd vec)
+{
+	// std::vector<float> stl_vec;
+	std::vector<float> stl_vec(vec.data(), vec.data() + vec.rows() * vec.cols());
+	return stl_vec;
+}
+
+/**
  * @brief Function to extract component forces in x,y,z direction from force vector
  * 
  * @param contact_points - Name of the contact points of force

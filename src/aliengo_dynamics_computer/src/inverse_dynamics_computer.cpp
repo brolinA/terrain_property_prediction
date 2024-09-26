@@ -15,6 +15,7 @@ computeInverseDynamics::computeInverseDynamics(std::string robot_model_path)
   odom_sub_ = nh_.subscribe("/odom", 10, &computeInverseDynamics::odometryCallback, this);
   force_pub_ = nh_.advertise<aliengo_dynamics_computer::FootForces>("pinocchio_leg_forces_magnitude", 10);
   reaction_force_pub_ = nh_.advertise<aliengo_dynamics_computer::ReactionForce>("pinocchio_leg_forces_components", 10);
+  pinocchio_debug_pub_ = nh_.advertise<aliengo_dynamics_computer::PinocchioDebug>("pinocchio_debug", 10);
 
   createModelAndData(robot_model_path); //create the robot mode for pinocchio from the URDF file
   ROS_INFO("Successfully initialized");
@@ -38,30 +39,32 @@ void computeInverseDynamics::createModelAndData(std::string urdf_path)
 	torque_ = Eigen::VectorXd(robot_model_.nv);
 
 	//Define the contact points and get the ID to compute jacobians
-	//you can get the list of frame using the robot_model_.frames variable. Refere below in the debug print for more info
-	contact_points_ = {"FL_foot_fixed", "FR_foot_fixed", "RL_foot_fixed", "RR_foot_fixed"}; //using suffix fixed here to indicate joint type
+	//you can get the list of frame using the robot_model_.frames variable. Refer below in the debug print for more info
+	// contact_points_ = {"FL_foot_fixed", "FR_foot_fixed", "RL_foot_fixed", "RR_foot_fixed"}; //using suffix fixed here to indicate joint type
 	
 	//If using this vector then change the type in th getFrameId function below from FIXED_JOINT to BODY
-	// contact_points_ = {"FL_foot", "FR_foot", "RL_foot", "RR_foot"};
+	contact_points_ = {"FL_foot", "FR_foot", "RL_foot", "RR_foot"};
 	
 	for(auto contact_pt:contact_points_){
-    contact_pt_ids_.push_back(robot_model_.getFrameId(contact_pt, FIXED_JOINT));
+    // contact_pt_ids_.push_back(robot_model_.getFrameId(contact_pt, FIXED_JOINT));
+    contact_pt_ids_.push_back(robot_model_.getFrameId(contact_pt, BODY));
     // std::cout << contact_pt << ": " << contact_pt_ids_.back() << std::endl;
   }
 
-	/*
+	
 	//Debug prints to help understand the matrices
-	ROS_INFO("Matrix sizes:");
-	ROS_INFO("M: %ldx%ld", robot_data_.M.rows(), robot_data_.M.cols());
-	ROS_INFO("C: %ldx%ld", robot_data_.C.rows(), robot_data_.C.cols());
-	ROS_INFO("g: %ldx%ld", robot_data_.g.rows(), robot_data_.g.cols());
-	ROS_INFO("J: %ldx%ld", jointJacobian.rows(), jointJacobian.cols());
-	ROS_INFO("Pinv J: %ldx%ld", invJointJacobian.rows(), invJointJacobian.cols());
-	ROS_INFO("q: %ldx%ld", q_.rows(), q_.cols());
-	ROS_INFO("q_dot: %ldx%ld", q_dot_.rows(), q_dot_.cols());
-	ROS_INFO("Force: %ldx%ld", force_.rows(), force_.cols());
-	std::cout << "robot mass: " << robot_data_.mass[0] * 9.81 << std::endl;
-	*/
+	// ROS_INFO_ONCE("Matrix sizes:");
+	// ROS_INFO_ONCE("M: %ldx%ld", robot_data_.M.rows(), robot_data_.M.cols());
+	// ROS_INFO_ONCE("C: %ldx%ld", robot_data_.C.rows(), robot_data_.C.cols());
+	// ROS_INFO_ONCE("g: %ldx%ld", robot_data_.g.rows(), robot_data_.g.cols());
+	// ROS_INFO_ONCE("J: %ldx%ld", jointJacobian.rows(), jointJacobian.cols());
+	// ROS_INFO_ONCE("Pinv J: %ldx%ld", invJointJacobian.rows(), invJointJacobian.cols());
+	// ROS_INFO_ONCE("q: %ldx%ld", q_.rows(), q_.cols());
+	// ROS_INFO_ONCE("q_dot: %ldx%ld", q_dot_.rows(), q_dot_.cols());
+	// ROS_INFO_ONCE("torque: %ldx%ld", torque_.rows(), torque_.cols());
+	// ROS_INFO_ONCE("Force: %ldx%ld", force_.rows(), force_.cols());
+	// std::cout << "robot mass: " << robot_data_.mass[0] * 9.81 << std::endl;
+	
 	//list of all joints and their DOF
 	// int i=0;
 	// for (auto joint:robot_model_.names)
@@ -77,16 +80,6 @@ void computeInverseDynamics::createModelAndData(std::string urdf_path)
 
 void computeInverseDynamics::jointDataCallback(const sensor_msgs::JointState::ConstPtr& joint_data)
 {
-	if(!robot_dynamic_data_.size_initialized_)
-	{
-		//initialize the variable size. Hardcoding the size for now
-		//3 DOF per leg * 4 leg = 12 DOF total
-		robot_dynamic_data_.joint_q_ = Eigen::VectorXd(12);
-		robot_dynamic_data_.joint_q_dot_ = Eigen::VectorXd(12);
-		robot_dynamic_data_.joint_torque_ = Eigen::VectorXd(12);
-		robot_dynamic_data_.size_initialized_ = true;
-	}
-
 	//test if the vector is not empty. Sometimes the joint_state topic returns empty arrays
 	if(robot_model_created_ && 
 		 !joint_data->position.empty() &&
@@ -129,12 +122,20 @@ void computeInverseDynamics::odometryCallback(const nav_msgs::Odometry::ConstPtr
 		q_dot_ << util_func_.twistToVector(odom_data->twist.twist), robot_dynamic_data_.joint_q_dot_;
 		torque_ << 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, robot_dynamic_data_.joint_torque_; //using 0 for torque on body
 
-		odom_available_ = true;
+		// odom_available_ = true;
+		robot_dynamic_data_.dynamics_data_updated_ = false;
 		
 		//Debug prints
 		// std::cout << "q: " << q_.transpose() << std::endl;
 		// std::cout << "q_dot: " << q_dot_.transpose() << std::endl;
 		// std::cout << "torque: " << torque_.transpose() << std::endl;
+
+		//Debug publisher
+		aliengo_dynamics_computer::PinocchioDebug pin_debug;
+		pin_debug.joint_angle = util_func_.eigenToStlVector(q_);
+		pin_debug.joint_velocity = util_func_.eigenToStlVector(q_dot_);
+		pin_debug.joint_torque = util_func_.eigenToStlVector(torque_);
+		pinocchio_debug_pub_.publish(pin_debug);
 	}
 	computeFootForce(); //computer force on each foot using inverse dynamics
 }
@@ -144,7 +145,7 @@ void computeInverseDynamics::computeFootForce()
 	//computing all the dynamics terms. result is stored in the robot_model_variable
   pinocchio::computeAllTerms(robot_model_, robot_data_, q_, q_dot_);
 
-	//compute corriollis matrix
+	//compute coriolis matrix
   pinocchio::computeCoriolisMatrix(robot_model_, robot_data_, q_, q_dot_);
   
 	//updating the robot model in pinocchio
@@ -169,9 +170,9 @@ void computeInverseDynamics::computeFootForce()
 	Eigen::VectorXd force_;
 	force_ = inv_joint_jacobian * ( robot_data_.M * q_dot_ + robot_data_.nle - torque_);
 
-	std::cout << "Force (F): " << force_.transpose() << std::endl;
+	// std::cout << "Force (F): " << force_.transpose() << std::endl;
 
-	Eigen::Vector4d leg_force = util_func_.computeForcePerLeg(contact_points_, force_, true);
+	Eigen::Vector4d leg_force = util_func_.computeForcePerLeg(contact_points_, force_, false);
 	publishFootForce(leg_force);
 
 	//publish the force components as ROS message

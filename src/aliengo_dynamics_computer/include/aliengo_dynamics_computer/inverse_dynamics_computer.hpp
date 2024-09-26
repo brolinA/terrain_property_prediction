@@ -14,6 +14,7 @@
 #include <pinocchio/algorithm/frames.hpp>
 
 #include <iostream>
+#include <vector>
 #include <boost/circular_buffer.hpp>
 //ros includes
 #include <ros/ros.h>
@@ -24,6 +25,7 @@
 //custom message
 #include <aliengo_dynamics_computer/ReactionForce.h>
 #include <aliengo_dynamics_computer/FootForces.h>
+#include <aliengo_dynamics_computer/PinocchioDebug.h>
 
 using namespace pinocchio;
 
@@ -80,8 +82,6 @@ private:
      */
     struct robotDynamicsData{
 
-        bool size_initialized_ = false;
-
         bool dynamics_data_updated_ = false;
 
         Eigen::VectorXd joint_q_; //!< joint position vector excluding base
@@ -90,6 +90,19 @@ private:
 
         Eigen::VectorXd joint_torque_; //!< joint torque vector excluding base
 
+        /**
+         * @brief Constructor
+         * 
+        */
+       robotDynamicsData()
+       {
+        //initialize the variable size. Hardcoding the size for now
+		//3 DOF per leg * 4 leg = 12 DOF total
+		joint_q_ = Eigen::VectorXd(12);
+		joint_q_dot_ = Eigen::VectorXd(12);
+		joint_torque_ = Eigen::VectorXd(12);
+       }
+        
         /**
          * \brief Function to the joint data to the vectors
          * 
@@ -111,6 +124,8 @@ private:
     ros::Publisher force_pub_; //!< publish the cumulative force per leg
 
     ros::Publisher reaction_force_pub_; //!< publish the force as x,y,z components per leg
+
+    ros::Publisher pinocchio_debug_pub_; //!< publish the force as x,y,z components per leg
 
 
     //Function definitions

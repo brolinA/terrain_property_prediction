@@ -59,6 +59,7 @@ add_message_files(
   FILES
   ReactionForce.msg
   FootForces.msg
+  PinocchioDebug.msg
 )
 
 ## Generate services in the 'srv' folder
