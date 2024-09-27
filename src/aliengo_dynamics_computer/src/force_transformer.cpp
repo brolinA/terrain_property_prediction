@@ -54,10 +54,12 @@ void forceTransformer::footSynchronizerCallback(const geometry_msgs::WrenchStamp
   transformForce(*foot2, component_reaction_forces, magnitude_forces.FR_foot);
   transformForce(*foot3, component_reaction_forces, magnitude_forces.RL_foot);
   transformForce(*foot4, component_reaction_forces, magnitude_forces.RR_foot);
-  ROS_INFO("Totatl Magnitude: %lf", (magnitude_forces.FL_foot+magnitude_forces.FR_foot+magnitude_forces.RL_foot+magnitude_forces.RR_foot));
-  ROS_INFO("--------------------------");
+  // ROS_INFO("Total Magnitude: %lf", (magnitude_forces.FL_foot+magnitude_forces.FR_foot+magnitude_forces.RL_foot+magnitude_forces.RR_foot));
+  // ROS_INFO("--------------------------");
 
   //publish force
+	component_reaction_forces.header.stamp = ros::Time::now();
+	magnitude_forces.header.stamp = ros::Time::now();
   reaction_force_pub_.publish(component_reaction_forces);
   foot_force_pub_.publish(magnitude_forces);
 }
@@ -114,5 +116,5 @@ void forceTransformer::transformForce(geometry_msgs::WrenchStamped foot_force, a
   magnitude = std::sqrt(pow(force_vector.getX(),2)+pow(force_vector.getY(),2)+pow(force_vector.getZ(),2));
   component_force.reaction_forces.push_back(transformed_force);
 
-  ROS_INFO("Mag %s : %lf", foot_force.header.frame_id.c_str(), magnitude);
+  // ROS_INFO("Mag %s : %lf", foot_force.header.frame_id.c_str(), magnitude);
 }

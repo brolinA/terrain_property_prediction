@@ -199,6 +199,7 @@ void computeInverseDynamics::computeFootForce()
 	//publish the force components as ROS message
 	aliengo_dynamics_computer::ReactionForce leg_reaction_forces;
 	util_func_.vectorToForceMsg(contact_points_, force_, leg_reaction_forces);
+	leg_reaction_forces.header.stamp = ros::Time::now();
 	reaction_force_pub_.publish(leg_reaction_forces);
 }
 
@@ -238,6 +239,7 @@ void computeInverseDynamics::publishFootForce(Eigen::Vector4d foot_forces)
 	//contact_points_ = {"FL_foot_fixed", "FR_foot_fixed", "RL_foot_fixed", "RR_foot_fixed"}
 	
 	aliengo_dynamics_computer::FootForces forces;
+	forces.header.stamp = ros::Time::now();
 	forces.FL_foot = foot_forces[0];
 	forces.FR_foot = foot_forces[1];
 	forces.RL_foot = foot_forces[2];

@@ -79,7 +79,6 @@ Eigen::VectorXd poseToVector(geometry_msgs::Pose msg)
  */
 std::vector<float> eigenToStlVector(Eigen::VectorXd vec)
 {
-	// std::vector<float> stl_vec;
 	std::vector<float> stl_vec(vec.data(), vec.data() + vec.rows() * vec.cols());
 	return stl_vec;
 }
