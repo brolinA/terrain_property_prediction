@@ -1,0 +1,4 @@
+<launch>
+    <include file="$(find aliengo_dynamics_computer)/launch/gazebo_force_publisher.launch" />
+    <include file="$(find aliengo_dynamics_computer)/launch/inverse_dynamics.launch" />
+</launch>

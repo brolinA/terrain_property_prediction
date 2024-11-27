@@ -78,7 +78,7 @@ private:
      */
     struct robotDynamicsData{
 
-        const int MAX_DATA_BUFFER_SIZE = 5; //!< buffer size
+        const int MAX_DATA_BUFFER_SIZE = 3; //!< buffer size
 
         bool dynamics_data_updated_ = false;
 

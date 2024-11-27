@@ -71,9 +71,10 @@ void computeInverseDynamics::createModelAndData(std::string urdf_path)
 
 	//list of all the frames in the model
 	//reference: https://gepettoweb.laas.fr/doc/stack-of-tasks/pinocchio/master/doxygen-html/structpinocchio_1_1FrameTpl.html
-	// for (auto frame:robot_model_.frames)
-	// 	std::cout << frame.name << " --> " << frame.type << std::endl;
-
+// 	for (auto frame:robot_model_.frames){
+// 		std::cout << frame.name << " --> " << frame.type << std::endl;
+// // 		std::cout << "Placement: \n" << frame.placement << std::endl;
+// }
 	robot_model_created_ = true;
 }
 
@@ -240,6 +241,7 @@ void computeInverseDynamics::publishFootForce(Eigen::Vector4d foot_forces)
 	
 	aliengo_dynamics_computer::FootForces forces;
 	forces.header.stamp = ros::Time::now();
+	forces.header.frame_id = "base";
 	forces.FL_foot = foot_forces[0];
 	forces.FR_foot = foot_forces[1];
 	forces.RL_foot = foot_forces[2];

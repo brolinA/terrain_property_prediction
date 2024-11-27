@@ -4,12 +4,15 @@
     <arg name="robot_name" default="/" />
     <arg name="rviz" default="true" />
     <!-- Path to Gazebo world you want to load. -->
-    <arg name="world_model_name" default="agriculture_world" /> <!--OPTIONS: agriculture_world, outdoor-->
+    <arg name="world_model_name" default="terrain_test_world" /> <!--OPTIONS: agriculture_world, outdoor, empty_terrain_test,
+                                                                     terrain_test_world, leave empty for empty world-->
     <arg name="gazebo_world"     default="$(find aliengo_wild_visual_navigation)/worlds/$(arg world_model_name).world" />
     <arg name="world_init_x" default="0.0" /> <!-- X Initial position of the robot in Gazebo World -->
-    <arg name="world_init_y" default="4.0" /> <!-- Y Initial position of the robot in Gazebo World -->
+    <arg name="world_init_y" default="3.5" /> <!-- Y Initial position of the robot in Gazebo World -->
     <arg name="world_init_z" default="0.6" /> <!-- Z Initial position of the robot in Gazebo World -->
+    <arg name="world_init_heading_angle" default="3.14" /> <!-- Yaw Initial angle of the robot in Gazebo World -->
     <arg name="description_file"       default="$(find aliengo_wild_visual_navigation)/xacro/aliengo.champ.urdf"/> <!-- Path to URDF file Do not touch this. -->
+    <!--arg name="description_file"       default="$(find aliengo_wild_visual_navigation)/xacro/pinnochio_aliengo.champ.urdf"/--> <!-- Path to URDF file Do not touch this. -->
 
 
     <!-- Spawn robot in gazebo -->
@@ -18,6 +21,7 @@
         <arg name="world_init_x" value="$(arg world_init_x)" />
         <arg name="world_init_y" value="$(arg world_init_y)" />
         <arg name="world_init_z" value="$(arg world_init_z)" />
+        <arg name="world_init_heading" value="$(arg world_init_heading_angle)" />
         <arg name="description_file" value="$(arg description_file)" />
     </include>
 

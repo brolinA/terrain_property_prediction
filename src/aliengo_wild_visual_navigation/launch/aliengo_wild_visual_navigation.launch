@@ -11,6 +11,6 @@
     </include>
 
     <!-- Jackal state converter required by WVN -->
-    <node name="aliengo_state_converter_node" pkg="aliengo_wild_visual_navigation" type="aliengo_state_converter_node.py"/>
+    <node name="aliengo_state_converter_node" pkg="aliengo_wild_visual_navigation" type="aliengo_state_converter_node.py" output="screen"/>
 
 </launch>  
