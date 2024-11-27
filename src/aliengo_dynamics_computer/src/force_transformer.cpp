@@ -18,6 +18,8 @@ forceTransformer::forceTransformer(/* args */)
   footSynchronizer->registerCallback(boost::bind(&forceTransformer::footSynchronizerCallback, this, _1, _2, _3, _4));
   reaction_force_pub_ = nh_.advertise<aliengo_dynamics_computer::ReactionForce>("gazebo_leg_forces_components", 2);
   foot_force_pub_ = nh_.advertise<aliengo_dynamics_computer::FootForces>("gazebo_leg_forces_magnitude", 2);
+  test_odom_pub_ = nh_.advertise<nav_msgs::Odometry>("/test_odom", 2);
+  odom_sub_ = nh_.subscribe("/odom", 10, &forceTransformer::odometryCallback, this);
 
   ROS_INFO("Done initializing %s", ros::this_node::getName().c_str());
 
@@ -43,6 +45,16 @@ void forceTransformer::loadParams()
   }
 }
 
+void forceTransformer::odometryCallback(const nav_msgs::Odometry::ConstPtr& odom_data)
+{
+  nav_msgs::Odometry new_odom;
+  new_odom = *odom_data;
+  new_odom.twist.twist.linear.x = magnitude_forces_g_.FL_foot;
+  new_odom.twist.twist.linear.y = magnitude_forces_g_.RR_foot;
+  test_odom_pub_.publish(new_odom);
+}
+
+
 void forceTransformer::footSynchronizerCallback(const geometry_msgs::WrenchStampedConstPtr& foot1, const geometry_msgs::WrenchStampedConstPtr& foot2,
                                   const geometry_msgs::WrenchStampedConstPtr& foot3, const geometry_msgs::WrenchStampedConstPtr& foot4)
 {
@@ -56,10 +68,11 @@ void forceTransformer::footSynchronizerCallback(const geometry_msgs::WrenchStamp
   transformForce(*foot4, component_reaction_forces, magnitude_forces.RR_foot);
   // ROS_INFO("Total Magnitude: %lf", (magnitude_forces.FL_foot+magnitude_forces.FR_foot+magnitude_forces.RL_foot+magnitude_forces.RR_foot));
   // ROS_INFO("--------------------------");
-
+  magnitude_forces_g_ = magnitude_forces;
   //publish force
 	component_reaction_forces.header.stamp = ros::Time::now();
 	magnitude_forces.header.stamp = ros::Time::now();
+  magnitude_forces.header.frame_id = base_frame_;
   reaction_force_pub_.publish(component_reaction_forces);
   foot_force_pub_.publish(magnitude_forces);
 }
@@ -80,7 +93,7 @@ geometry_msgs::TransformStamped forceTransformer::getTransformation(std::string 
 
 tf2::Vector3 forceTransformer::getTransformedForce (geometry_msgs::TransformStamped transform, geometry_msgs::WrenchStamped foot_force)
 {
-  //create rotation matix
+  //create rotation matrix
   tf2::Quaternion q;
   tf2::Matrix3x3 rot_matrix;
   
@@ -117,4 +130,4 @@ void forceTransformer::transformForce(geometry_msgs::WrenchStamped foot_force, a
   component_force.reaction_forces.push_back(transformed_force);
 
   // ROS_INFO("Mag %s : %lf", foot_force.header.frame_id.c_str(), magnitude);
-}
+} 

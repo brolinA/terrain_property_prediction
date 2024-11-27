@@ -7,6 +7,7 @@
 #include <geometry_msgs/TransformStamped.h>
 #include <geometry_msgs/WrenchStamped.h>
 #include <geometry_msgs/Twist.h>
+#include <nav_msgs/Odometry.h>
 #include <tf2/LinearMath/Quaternion.h>
 #include <tf2/LinearMath/Matrix3x3.h>
 #include <tf2_geometry_msgs/tf2_geometry_msgs.h>
@@ -102,6 +103,11 @@ private:
      */
     ros::Publisher foot_force_pub_;
 
+    ros::Publisher test_odom_pub_;
+    ros::Subscriber odom_sub_;
+    aliengo_dynamics_computer::FootForces magnitude_forces_g_;
+
+    void odometryCallback(const nav_msgs::Odometry::ConstPtr& odom_data);
     //create functions
 
     /**
