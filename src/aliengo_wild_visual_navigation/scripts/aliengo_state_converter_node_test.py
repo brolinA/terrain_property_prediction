@@ -9,6 +9,7 @@ from std_msgs.msg import Float32
 import math
 from nav_msgs.msg import Odometry
 from wild_visual_navigation_msgs.msg import RobotState, CustomState
+from aliengo_dynamics_computer.msg import FootForces
 import rospy
 
 # Preallocate messages
@@ -99,10 +100,12 @@ def twist_msg_callback(msg):
     out_msg = TwistStamped()
     out_msg.header.stamp = ts
     out_msg.header.frame_id = "base"
-    out_msg.twist = msg
+    # out_msg.twist = 
+    out_msg.twist.linear.x = msg.FL_foot
+    out_msg.twist.linear.y = msg.RR_foot
 
-    x_err_ = (msg.linear.x - robot_state_msg.states[4].values[7])
-    y_err_ = (msg.linear.y - robot_state_msg.states[4].values[8])
+    x_err_ = (out_msg.twist.linear.x - robot_state_msg.states[4].values[7])
+    y_err_ = (out_msg.twist.linear.y - robot_state_msg.states[4].values[8])
 
     err_msg = Float32()
     err_msg.data = math.sqrt(x_err_**2 + y_err_**2)
@@ -115,11 +118,11 @@ if __name__ == "__main__":
     rospy.init_node("aliengo_state_converter_node")
 
     # We subscribe the odometry topic (state)
-    jackal_state_sub = rospy.Subscriber("/odom", Odometry, aliengo_msg_callback, queue_size=20)
+    jackal_state_sub = rospy.Subscriber("/test_odom", Odometry, aliengo_msg_callback, queue_size=20)
     robot_state_pub = rospy.Publisher("/wild_visual_navigation_node/robot_state", RobotState, queue_size=20)
 
     # And also the twist command from teleoperation
-    ref_twist_sub = rospy.Subscriber("/cmd_vel", Twist, twist_msg_callback, queue_size=20)
+    ref_twist_sub = rospy.Subscriber("/pinocchio_leg_forces_magnitude", FootForces, twist_msg_callback, queue_size=20)
     ref_twiststamped_pub = rospy.Publisher("/wild_visual_navigation_node/reference_twist", TwistStamped, queue_size=20)
     error_pub = rospy.Publisher("/wild_visual_navigation_node/error", Float32, queue_size=20)
 
