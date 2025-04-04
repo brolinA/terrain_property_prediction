@@ -108,23 +108,23 @@ def twist_msg_callback(msg):
     y_err_ = (out_msg.twist.linear.y - robot_state_msg.states[4].values[8])
 
     err_msg = Float32()
-    err_msg.data = math.sqrt(x_err_**2 + y_err_**2)
+    err_msg.data = 0.5 * (x_err_**2 + y_err_**2)
     # print(f"Error is {err_msg.data}")
     error_pub.publish(err_msg)
     ref_twiststamped_pub.publish(out_msg)
 
 
 if __name__ == "__main__":
-    rospy.init_node("aliengo_state_converter_node")
+    rospy.init_node("test_aliengo_state_converter_node")
 
     # We subscribe the odometry topic (state)
     jackal_state_sub = rospy.Subscriber("/test_odom", Odometry, aliengo_msg_callback, queue_size=20)
-    robot_state_pub = rospy.Publisher("/wild_visual_navigation_node/robot_state", RobotState, queue_size=20)
+    robot_state_pub = rospy.Publisher("/test_wild_visual_navigation_node/robot_state", RobotState, queue_size=20)
 
     # And also the twist command from teleoperation
     ref_twist_sub = rospy.Subscriber("/pinocchio_leg_forces_magnitude", FootForces, twist_msg_callback, queue_size=20)
-    ref_twiststamped_pub = rospy.Publisher("/wild_visual_navigation_node/reference_twist", TwistStamped, queue_size=20)
-    error_pub = rospy.Publisher("/wild_visual_navigation_node/error", Float32, queue_size=20)
+    ref_twiststamped_pub = rospy.Publisher("/test_wild_visual_navigation_node/reference_twist", TwistStamped, queue_size=20)
+    error_pub = rospy.Publisher("/test_wild_visual_navigation_node/error", Float32, queue_size=20)
 
     rospy.loginfo("[aliengo_state_converter_node] ready")
     rospy.spin()
