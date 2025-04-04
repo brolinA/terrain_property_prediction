@@ -105,7 +105,7 @@ def twist_msg_callback(msg):
     y_err_ = (msg.linear.y - robot_state_msg.states[4].values[8])
 
     err_msg = Float32()
-    err_msg.data = math.sqrt(x_err_**2 + y_err_**2)
+    err_msg.data = (x_err_**2 + y_err_**2)/2
     # print(f"Error is {err_msg.data}")
     error_pub.publish(err_msg)
     ref_twiststamped_pub.publish(out_msg)

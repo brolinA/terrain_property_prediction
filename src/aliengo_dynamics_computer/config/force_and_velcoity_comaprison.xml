@@ -3,7 +3,7 @@
     <table>
         <background_color>#ffffff</background_color>
         <foreground_color>#000000</foreground_color>
-        <link_cursor>true</link_cursor>
+        <link_cursor>false</link_cursor>
         <link_scale>false</link_scale>
         <plots>
             <row_0>
@@ -11,133 +11,8 @@
                     <axes>
                         <axes>
                             <x_axis>
-                                <custom_title>ROS Time (s)</custom_title>
-                                <title_type>1</title_type>
-                                <title_visible>true</title_visible>
-                            </x_axis>
-                            <y_axis>
-                                <custom_title>Force (N)</custom_title>
-                                <title_type>1</title_type>
-                                <title_visible>true</title_visible>
-                            </y_axis>
-                        </axes>
-                    </axes>
-                    <curves>
-                        <curve_0>
-                            <axes>
-                                <x_axis>
-                                    <field></field>
-                                    <field_type>1</field_type>
-                                    <scale>
-                                        <absolute_maximum>1000</absolute_maximum>
-                                        <absolute_minimum>0</absolute_minimum>
-                                        <relative_maximum>0</relative_maximum>
-                                        <relative_minimum>-1000</relative_minimum>
-                                        <type>0</type>
-                                    </scale>
-                                    <topic>/gazebo_leg_forces_magnitude</topic>
-                                    <type>aliengo_dynamics_computer/FootForces</type>
-                                </x_axis>
-                                <y_axis>
-                                    <field>FL_foot</field>
-                                    <field_type>0</field_type>
-                                    <scale>
-                                        <absolute_maximum>64</absolute_maximum>
-                                        <absolute_minimum>63</absolute_minimum>
-                                        <relative_maximum>1</relative_maximum>
-                                        <relative_minimum>0</relative_minimum>
-                                        <type>0</type>
-                                    </scale>
-                                    <topic>/gazebo_leg_forces_magnitude</topic>
-                                    <type>aliengo_dynamics_computer/FootForces</type>
-                                </y_axis>
-                            </axes>
-                            <color>
-                                <custom_color>#000000</custom_color>
-                                <type>0</type>
-                            </color>
-                            <data>
-                                <circular_buffer_capacity>1000</circular_buffer_capacity>
-                                <time_frame_length>60</time_frame_length>
-                                <type>0</type>
-                            </data>
-                            <style>
-                                <lines_interpolate>false</lines_interpolate>
-                                <pen_style>1</pen_style>
-                                <pen_width>1</pen_width>
-                                <render_antialias>false</render_antialias>
-                                <steps_invert>false</steps_invert>
-                                <sticks_baseline>0</sticks_baseline>
-                                <sticks_orientation>2</sticks_orientation>
-                                <type>0</type>
-                            </style>
-                            <subscriber_queue_size>10</subscriber_queue_size>
-                            <title>gazebo</title>
-                        </curve_0>
-                        <curve_1>
-                            <axes>
-                                <x_axis>
-                                    <field></field>
-                                    <field_type>1</field_type>
-                                    <scale>
-                                        <absolute_maximum>1000</absolute_maximum>
-                                        <absolute_minimum>0</absolute_minimum>
-                                        <relative_maximum>0</relative_maximum>
-                                        <relative_minimum>-1000</relative_minimum>
-                                        <type>0</type>
-                                    </scale>
-                                    <topic>/pinocchio_leg_forces_magnitude</topic>
-                                    <type>aliengo_dynamics_computer/FootForces</type>
-                                </x_axis>
-                                <y_axis>
-                                    <field>FL_foot</field>
-                                    <field_type>0</field_type>
-                                    <scale>
-                                        <absolute_maximum>1000</absolute_maximum>
-                                        <absolute_minimum>0</absolute_minimum>
-                                        <relative_maximum>1</relative_maximum>
-                                        <relative_minimum>0</relative_minimum>
-                                        <type>0</type>
-                                    </scale>
-                                    <topic>/pinocchio_leg_forces_magnitude</topic>
-                                    <type>aliengo_dynamics_computer/FootForces</type>
-                                </y_axis>
-                            </axes>
-                            <color>
-                                <custom_color>#0956ff</custom_color>
-                                <type>1</type>
-                            </color>
-                            <data>
-                                <circular_buffer_capacity>1000</circular_buffer_capacity>
-                                <time_frame_length>10</time_frame_length>
-                                <type>0</type>
-                            </data>
-                            <style>
-                                <lines_interpolate>false</lines_interpolate>
-                                <pen_style>1</pen_style>
-                                <pen_width>1</pen_width>
-                                <render_antialias>false</render_antialias>
-                                <steps_invert>false</steps_invert>
-                                <sticks_baseline>0</sticks_baseline>
-                                <sticks_orientation>2</sticks_orientation>
-                                <type>0</type>
-                            </style>
-                            <subscriber_queue_size>100</subscriber_queue_size>
-                            <title>pinocchio</title>
-                        </curve_1>
-                    </curves>
-                    <legend>
-                        <visible>true</visible>
-                    </legend>
-                    <plot_rate>30</plot_rate>
-                    <title>FL magnitude</title>
-                </column_0>
-                <column_1>
-                    <axes>
-                        <axes>
-                            <x_axis>
-                                <custom_title>Time</custom_title>
-                                <title_type>1</title_type>
+                                <custom_title>Untitled Axis</custom_title>
+                                <title_type>0</title_type>
                                 <title_visible>true</title_visible>
                             </x_axis>
                             <y_axis>
@@ -164,13 +39,13 @@
                                     <type>aliengo_dynamics_computer/FootForces</type>
                                 </x_axis>
                                 <y_axis>
-                                    <field>FR_foot</field>
+                                    <field>FL_foot</field>
                                     <field_type>0</field_type>
                                     <scale>
-                                        <absolute_maximum>64</absolute_maximum>
-                                        <absolute_minimum>63</absolute_minimum>
-                                        <relative_maximum>1</relative_maximum>
-                                        <relative_minimum>0</relative_minimum>
+                                        <absolute_maximum>1000</absolute_maximum>
+                                        <absolute_minimum>0</absolute_minimum>
+                                        <relative_maximum>0</relative_maximum>
+                                        <relative_minimum>-1000</relative_minimum>
                                         <type>0</type>
                                     </scale>
                                     <topic>/gazebo_leg_forces_magnitude</topic>
@@ -183,7 +58,7 @@
                             </color>
                             <data>
                                 <circular_buffer_capacity>1000</circular_buffer_capacity>
-                                <time_frame_length>60</time_frame_length>
+                                <time_frame_length>10</time_frame_length>
                                 <type>0</type>
                             </data>
                             <style>
@@ -196,8 +71,8 @@
                                 <sticks_orientation>2</sticks_orientation>
                                 <type>0</type>
                             </style>
-                            <subscriber_queue_size>10</subscriber_queue_size>
-                            <title>gazebo</title>
+                            <subscriber_queue_size>100</subscriber_queue_size>
+                            <title>gazebo_FL_force</title>
                         </curve_0>
                         <curve_1>
                             <axes>
@@ -211,17 +86,17 @@
                                         <relative_minimum>-1000</relative_minimum>
                                         <type>0</type>
                                     </scale>
-                                    <topic>/pinocchio_leg_forces_magnitude</topic>
+                                    <topic>/gazebo_leg_forces_magnitude</topic>
                                     <type>aliengo_dynamics_computer/FootForces</type>
                                 </x_axis>
                                 <y_axis>
-                                    <field>FR_foot</field>
+                                    <field>FL_foot</field>
                                     <field_type>0</field_type>
                                     <scale>
                                         <absolute_maximum>1000</absolute_maximum>
                                         <absolute_minimum>0</absolute_minimum>
-                                        <relative_maximum>1</relative_maximum>
-                                        <relative_minimum>0</relative_minimum>
+                                        <relative_maximum>0</relative_maximum>
+                                        <relative_minimum>-1000</relative_minimum>
                                         <type>0</type>
                                     </scale>
                                     <topic>/pinocchio_leg_forces_magnitude</topic>
@@ -248,9 +123,32 @@
                                 <type>0</type>
                             </style>
                             <subscriber_queue_size>100</subscriber_queue_size>
-                            <title>pinocchio</title>
+                            <title>pinocchio_force</title>
                         </curve_1>
-                        <curve_2>
+                    </curves>
+                    <legend>
+                        <visible>true</visible>
+                    </legend>
+                    <plot_rate>30</plot_rate>
+                    <title>Force_comparison</title>
+                </column_0>
+                <column_1>
+                    <axes>
+                        <axes>
+                            <x_axis>
+                                <custom_title>Untitled Axis</custom_title>
+                                <title_type>0</title_type>
+                                <title_visible>true</title_visible>
+                            </x_axis>
+                            <y_axis>
+                                <custom_title>Untitled Axis</custom_title>
+                                <title_type>0</title_type>
+                                <title_visible>true</title_visible>
+                            </y_axis>
+                        </axes>
+                    </axes>
+                    <curves>
+                        <curve_0>
                             <axes>
                                 <x_axis>
                                     <field></field>
@@ -262,25 +160,76 @@
                                         <relative_minimum>-1000</relative_minimum>
                                         <type>0</type>
                                     </scale>
-                                    <topic>/foot_contacts</topic>
-                                    <type>champ_msgs/ContactsStamped</type>
+                                    <topic>/wild_visual_navigation_node/reference_twist</topic>
+                                    <type>geometry_msgs/TwistStamped</type>
                                 </x_axis>
                                 <y_axis>
-                                    <field>contacts/1</field>
+                                    <field>twist/linear/x</field>
                                     <field_type>0</field_type>
                                     <scale>
-                                        <absolute_maximum>2</absolute_maximum>
-                                        <absolute_minimum>-1</absolute_minimum>
+                                        <absolute_maximum>1000</absolute_maximum>
+                                        <absolute_minimum>0</absolute_minimum>
                                         <relative_maximum>0</relative_maximum>
                                         <relative_minimum>-1000</relative_minimum>
                                         <type>0</type>
                                     </scale>
-                                    <topic>/foot_contacts</topic>
-                                    <type>champ_msgs/ContactsStamped</type>
+                                    <topic>/wild_visual_navigation_node/reference_twist</topic>
+                                    <type>geometry_msgs/TwistStamped</type>
                                 </y_axis>
                             </axes>
                             <color>
-                                <custom_color>#097c29</custom_color>
+                                <custom_color>#000000</custom_color>
+                                <type>0</type>
+                            </color>
+                            <data>
+                                <circular_buffer_capacity>1000</circular_buffer_capacity>
+                                <time_frame_length>10</time_frame_length>
+                                <type>0</type>
+                            </data>
+                            <style>
+                                <lines_interpolate>false</lines_interpolate>
+                                <pen_style>1</pen_style>
+                                <pen_width>1</pen_width>
+                                <render_antialias>false</render_antialias>
+                                <steps_invert>false</steps_invert>
+                                <sticks_baseline>0</sticks_baseline>
+                                <sticks_orientation>2</sticks_orientation>
+                                <type>0</type>
+                            </style>
+                            <subscriber_queue_size>100</subscriber_queue_size>
+                            <title>desired_vel</title>
+                        </curve_0>
+                        <curve_1>
+                            <axes>
+                                <x_axis>
+                                    <field></field>
+                                    <field_type>1</field_type>
+                                    <scale>
+                                        <absolute_maximum>1000</absolute_maximum>
+                                        <absolute_minimum>0</absolute_minimum>
+                                        <relative_maximum>0</relative_maximum>
+                                        <relative_minimum>-1000</relative_minimum>
+                                        <type>0</type>
+                                    </scale>
+                                    <topic>/wild_visual_navigation_node/robot_state</topic>
+                                    <type>wild_visual_navigation_msgs/RobotState</type>
+                                </x_axis>
+                                <y_axis>
+                                    <field>states/4/values/7</field>
+                                    <field_type>0</field_type>
+                                    <scale>
+                                        <absolute_maximum>1000</absolute_maximum>
+                                        <absolute_minimum>0</absolute_minimum>
+                                        <relative_maximum>0</relative_maximum>
+                                        <relative_minimum>-1000</relative_minimum>
+                                        <type>0</type>
+                                    </scale>
+                                    <topic>/wild_visual_navigation_node/robot_state</topic>
+                                    <type>wild_visual_navigation_msgs/RobotState</type>
+                                </y_axis>
+                            </axes>
+                            <color>
+                                <custom_color>#0956ff</custom_color>
                                 <type>1</type>
                             </color>
                             <data>
@@ -292,21 +241,21 @@
                                 <lines_interpolate>false</lines_interpolate>
                                 <pen_style>1</pen_style>
                                 <pen_width>1</pen_width>
-                                <render_antialias>true</render_antialias>
+                                <render_antialias>false</render_antialias>
                                 <steps_invert>false</steps_invert>
                                 <sticks_baseline>0</sticks_baseline>
                                 <sticks_orientation>2</sticks_orientation>
                                 <type>0</type>
                             </style>
                             <subscriber_queue_size>100</subscriber_queue_size>
-                            <title>foot contact</title>
-                        </curve_2>
+                            <title>current_state</title>
+                        </curve_1>
                     </curves>
                     <legend>
                         <visible>true</visible>
                     </legend>
                     <plot_rate>30</plot_rate>
-                    <title>FR Magnitude </title>
+                    <title>X-velocity</title>
                 </column_1>
             </row_0>
             <row_1>
@@ -342,13 +291,13 @@
                                     <type>aliengo_dynamics_computer/FootForces</type>
                                 </x_axis>
                                 <y_axis>
-                                    <field>RL_foot</field>
+                                    <field>RR_foot</field>
                                     <field_type>0</field_type>
                                     <scale>
-                                        <absolute_maximum>64</absolute_maximum>
-                                        <absolute_minimum>63</absolute_minimum>
-                                        <relative_maximum>1</relative_maximum>
-                                        <relative_minimum>0</relative_minimum>
+                                        <absolute_maximum>1000</absolute_maximum>
+                                        <absolute_minimum>0</absolute_minimum>
+                                        <relative_maximum>0</relative_maximum>
+                                        <relative_minimum>-1000</relative_minimum>
                                         <type>0</type>
                                     </scale>
                                     <topic>/gazebo_leg_forces_magnitude</topic>
@@ -361,7 +310,7 @@
                             </color>
                             <data>
                                 <circular_buffer_capacity>1000</circular_buffer_capacity>
-                                <time_frame_length>60</time_frame_length>
+                                <time_frame_length>10</time_frame_length>
                                 <type>0</type>
                             </data>
                             <style>
@@ -374,8 +323,8 @@
                                 <sticks_orientation>2</sticks_orientation>
                                 <type>0</type>
                             </style>
-                            <subscriber_queue_size>10</subscriber_queue_size>
-                            <title>gazebo</title>
+                            <subscriber_queue_size>100</subscriber_queue_size>
+                            <title>gazebo_FL_force</title>
                         </curve_0>
                         <curve_1>
                             <axes>
@@ -389,17 +338,17 @@
                                         <relative_minimum>-1000</relative_minimum>
                                         <type>0</type>
                                     </scale>
-                                    <topic>/pinocchio_leg_forces_magnitude</topic>
+                                    <topic>/gazebo_leg_forces_magnitude</topic>
                                     <type>aliengo_dynamics_computer/FootForces</type>
                                 </x_axis>
                                 <y_axis>
-                                    <field>RL_foot</field>
+                                    <field>RR_foot</field>
                                     <field_type>0</field_type>
                                     <scale>
                                         <absolute_maximum>1000</absolute_maximum>
                                         <absolute_minimum>0</absolute_minimum>
-                                        <relative_maximum>1</relative_maximum>
-                                        <relative_minimum>0</relative_minimum>
+                                        <relative_maximum>0</relative_maximum>
+                                        <relative_minimum>-1000</relative_minimum>
                                         <type>0</type>
                                     </scale>
                                     <topic>/pinocchio_leg_forces_magnitude</topic>
@@ -426,65 +375,14 @@
                                 <type>0</type>
                             </style>
                             <subscriber_queue_size>100</subscriber_queue_size>
-                            <title>pinocchio</title>
+                            <title>pinocchio_force</title>
                         </curve_1>
-                        <curve_2>
-                            <axes>
-                                <x_axis>
-                                    <field></field>
-                                    <field_type>1</field_type>
-                                    <scale>
-                                        <absolute_maximum>1000</absolute_maximum>
-                                        <absolute_minimum>0</absolute_minimum>
-                                        <relative_maximum>0</relative_maximum>
-                                        <relative_minimum>-1000</relative_minimum>
-                                        <type>0</type>
-                                    </scale>
-                                    <topic>/foot_contacts</topic>
-                                    <type>champ_msgs/ContactsStamped</type>
-                                </x_axis>
-                                <y_axis>
-                                    <field>contacts/2</field>
-                                    <field_type>0</field_type>
-                                    <scale>
-                                        <absolute_maximum>2</absolute_maximum>
-                                        <absolute_minimum>-1</absolute_minimum>
-                                        <relative_maximum>0</relative_maximum>
-                                        <relative_minimum>-1000</relative_minimum>
-                                        <type>0</type>
-                                    </scale>
-                                    <topic>/foot_contacts</topic>
-                                    <type>champ_msgs/ContactsStamped</type>
-                                </y_axis>
-                            </axes>
-                            <color>
-                                <custom_color>#097c29</custom_color>
-                                <type>1</type>
-                            </color>
-                            <data>
-                                <circular_buffer_capacity>1000</circular_buffer_capacity>
-                                <time_frame_length>10</time_frame_length>
-                                <type>0</type>
-                            </data>
-                            <style>
-                                <lines_interpolate>false</lines_interpolate>
-                                <pen_style>1</pen_style>
-                                <pen_width>1</pen_width>
-                                <render_antialias>true</render_antialias>
-                                <steps_invert>false</steps_invert>
-                                <sticks_baseline>0</sticks_baseline>
-                                <sticks_orientation>2</sticks_orientation>
-                                <type>0</type>
-                            </style>
-                            <subscriber_queue_size>100</subscriber_queue_size>
-                            <title>foot contact</title>
-                        </curve_2>
                     </curves>
                     <legend>
                         <visible>true</visible>
                     </legend>
                     <plot_rate>30</plot_rate>
-                    <title>RL Magnitude</title>
+                    <title>RR Force</title>
                 </column_0>
                 <column_1>
                     <axes>
@@ -514,21 +412,21 @@
                                         <relative_minimum>-1000</relative_minimum>
                                         <type>0</type>
                                     </scale>
-                                    <topic>/gazebo_leg_forces_magnitude</topic>
-                                    <type>aliengo_dynamics_computer/FootForces</type>
+                                    <topic>/wild_visual_navigation_node/reference_twist</topic>
+                                    <type>geometry_msgs/TwistStamped</type>
                                 </x_axis>
                                 <y_axis>
-                                    <field>RR_foot</field>
+                                    <field>twist/linear/y</field>
                                     <field_type>0</field_type>
                                     <scale>
-                                        <absolute_maximum>64</absolute_maximum>
-                                        <absolute_minimum>63</absolute_minimum>
-                                        <relative_maximum>1</relative_maximum>
-                                        <relative_minimum>0</relative_minimum>
+                                        <absolute_maximum>1000</absolute_maximum>
+                                        <absolute_minimum>0</absolute_minimum>
+                                        <relative_maximum>0</relative_maximum>
+                                        <relative_minimum>-1000</relative_minimum>
                                         <type>0</type>
                                     </scale>
-                                    <topic>/gazebo_leg_forces_magnitude</topic>
-                                    <type>aliengo_dynamics_computer/FootForces</type>
+                                    <topic>/wild_visual_navigation_node/reference_twist</topic>
+                                    <type>geometry_msgs/TwistStamped</type>
                                 </y_axis>
                             </axes>
                             <color>
@@ -537,7 +435,7 @@
                             </color>
                             <data>
                                 <circular_buffer_capacity>1000</circular_buffer_capacity>
-                                <time_frame_length>60</time_frame_length>
+                                <time_frame_length>10</time_frame_length>
                                 <type>0</type>
                             </data>
                             <style>
@@ -550,8 +448,8 @@
                                 <sticks_orientation>2</sticks_orientation>
                                 <type>0</type>
                             </style>
-                            <subscriber_queue_size>10</subscriber_queue_size>
-                            <title>gazebo</title>
+                            <subscriber_queue_size>100</subscriber_queue_size>
+                            <title>desired_vel</title>
                         </curve_0>
                         <curve_1>
                             <axes>
@@ -565,21 +463,21 @@
                                         <relative_minimum>-1000</relative_minimum>
                                         <type>0</type>
                                     </scale>
-                                    <topic>/pinocchio_leg_forces_magnitude</topic>
-                                    <type>aliengo_dynamics_computer/FootForces</type>
+                                    <topic>/wild_visual_navigation_node/robot_state</topic>
+                                    <type>wild_visual_navigation_msgs/RobotState</type>
                                 </x_axis>
                                 <y_axis>
-                                    <field>RR_foot</field>
+                                    <field>states/4/values/8</field>
                                     <field_type>0</field_type>
                                     <scale>
                                         <absolute_maximum>1000</absolute_maximum>
                                         <absolute_minimum>0</absolute_minimum>
-                                        <relative_maximum>1</relative_maximum>
-                                        <relative_minimum>0</relative_minimum>
+                                        <relative_maximum>0</relative_maximum>
+                                        <relative_minimum>-1000</relative_minimum>
                                         <type>0</type>
                                     </scale>
-                                    <topic>/pinocchio_leg_forces_magnitude</topic>
-                                    <type>aliengo_dynamics_computer/FootForces</type>
+                                    <topic>/wild_visual_navigation_node/robot_state</topic>
+                                    <type>wild_visual_navigation_msgs/RobotState</type>
                                 </y_axis>
                             </axes>
                             <color>
@@ -602,17 +500,17 @@
                                 <type>0</type>
                             </style>
                             <subscriber_queue_size>100</subscriber_queue_size>
-                            <title>pinocchio</title>
+                            <title>current_state</title>
                         </curve_1>
                     </curves>
                     <legend>
                         <visible>true</visible>
                     </legend>
                     <plot_rate>30</plot_rate>
-                    <title>RR Magnitude</title>
+                    <title>y-velocity</title>
                 </column_1>
             </row_1>
         </plots>
-        <track_points>true</track_points>
+        <track_points>false</track_points>
     </table>
 </rqt_multiplot>
