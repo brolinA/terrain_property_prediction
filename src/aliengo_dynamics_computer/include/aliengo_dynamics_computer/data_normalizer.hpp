@@ -1,3 +1,5 @@
+#ifndef DATA_NORMALIZER_HPP
+#define DATA_NORMALIZER_HPP
 /**
  * @file data_normalizer.hpp
  * @brief Defines the DataNormalizer struct for normalizing data using a circular buffer.
@@ -122,3 +124,4 @@ struct DataNormalizer
             maxValue = newMaxValue;
     }
 };
+#endif // DATA_NORMALIZER_HPP
