@@ -144,20 +144,15 @@ private:
     ros::Publisher reaction_force_pub_; //!< publish the force as x,y,z components per leg
 
     ros::Publisher pinocchio_debug_pub_; //!< publish the force as x,y,z components per leg
+    
+    ros::Publisher normalized_force_pub_; //!< publish the normalized force per leg
+    
+    ros::Publisher normalized_force_component_pub_; //!< publish the normalized force as x,y,z components per leg
 
-    std::vector<DataNormalizer> normalized_force_; //!< vector to store the forces for each leg
+    std::vector<DataNormalizer> normalized_force_mangitude_; //!< vector to store the forces magnitudes for each leg
 
-    ros::Publisher normalized_force_pub_; //!< publish the force as x,y,z components per leg
+    std::vector<DataNormalizer> normalized_force_component_; //!< vector to store the forces components for each leg
 
-    enum FootNumber
-    {
-        FL = 0,
-        FR = 1,
-        RL = 2,
-        RR = 3
-    };
-
-    bool normalizeData(aliengo_dynamics_computer::FootForces force, aliengo_dynamics_computer::FootForces& normalized_force);
 
     //Function definitions
 

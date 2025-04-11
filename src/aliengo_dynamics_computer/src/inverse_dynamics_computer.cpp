@@ -9,22 +9,30 @@ computeInverseDynamics::computeInverseDynamics(std::string robot_model_path)
     ros::shutdown();
     return;
   }
+	
+	createModelAndData(robot_model_path); //create the robot mode for pinocchio from the URDF file
 
+	//initialize the vectors
+  for(int i=0; i<12; i++) //3 components for each leg
+		normalized_force_component_.push_back(DataNormalizer(100));
+	for(int i=0; i<4; i++) //4 total legs
+		normalized_force_mangitude_.push_back(DataNormalizer(100));
+		
   //Initialize publisher and subscribers
-  joint_data_sub_ = nh_.subscribe("/joint_states", 10, &computeInverseDynamics::jointDataCallback, this);
-  odom_sub_ = nh_.subscribe("/odom", 10, &computeInverseDynamics::odometryCallback, this);
   force_pub_ = nh_.advertise<aliengo_dynamics_computer::FootForces>("pinocchio_leg_forces_magnitude", 10);
   reaction_force_pub_ = nh_.advertise<aliengo_dynamics_computer::ReactionForce>("pinocchio_leg_forces_components", 10);
   pinocchio_debug_pub_ = nh_.advertise<aliengo_dynamics_computer::PinocchioDebug>("pinocchio_debug", 10);
   normalized_force_pub_ = nh_.advertise<aliengo_dynamics_computer::FootForces>("normalized_pinocchio_leg_forces_magnitude", 10);
-
-  createModelAndData(robot_model_path); //create the robot mode for pinocchio from the URDF file
-  ROS_INFO("Successfully initialized");
+  normalized_force_component_pub_ = nh_.advertise<aliengo_dynamics_computer::ReactionForce>("normalized_pinocchio_leg_forces_components", 10);
+  joint_data_sub_ = nh_.subscribe("/joint_states", 10, &computeInverseDynamics::jointDataCallback, this);
+  odom_sub_ = nh_.subscribe("/odom", 10, &computeInverseDynamics::odometryCallback, this);
+  
+	ROS_INFO("Successfully initialized");
 }
 
 computeInverseDynamics::~computeInverseDynamics()
 {
-
+	//empty destructor
 }
 
 void computeInverseDynamics::createModelAndData(std::string urdf_path)
@@ -199,10 +207,20 @@ void computeInverseDynamics::computeFootForce()
 	publishFootForce(leg_force);
 
 	//publish the force components as ROS message
-	aliengo_dynamics_computer::ReactionForce leg_reaction_forces;
-	util_func_.vectorToForceMsg(contact_points_, force_, leg_reaction_forces);
+	aliengo_dynamics_computer::ReactionForce leg_reaction_forces, normalized_leg_reaction_forces;
+
+	util_func_.vectorToForceMsg(contact_points_, force_, leg_reaction_forces); //convert to desired format
 	leg_reaction_forces.header.stamp = ros::Time::now();
 	reaction_force_pub_.publish(leg_reaction_forces);
+
+	//normalize the force components and publish
+	if(util_func_.normalizeComponentData(normalized_force_component_, leg_reaction_forces, normalized_leg_reaction_forces))
+	{
+		//publish the normalized force
+		normalized_leg_reaction_forces.header.stamp = ros::Time::now();
+		normalized_leg_reaction_forces.header.frame_id = "base";
+		normalized_force_component_pub_.publish(normalized_leg_reaction_forces);
+	}
 }
 
 void computeInverseDynamics::computeFrameJacobians(std::vector<Data::Matrix6x>& frame_jacobian)
@@ -252,54 +270,11 @@ void computeInverseDynamics::publishFootForce(Eigen::Vector4d foot_forces)
 
 	force_pub_.publish(forces);
 
-	if(normalizeData(forces, normalized_forces))
+	if(util_func_.normalizeMagnitudeData(normalized_force_mangitude_, forces, normalized_forces))
 	{
 		//publish the normalized force
 		normalized_forces.header.stamp = ros::Time::now();
 		normalized_forces.header.frame_id = "base";
 		normalized_force_pub_.publish(normalized_forces);
 	}
-	// else
-	// {
-	// 	ROS_INFO("[Pinocchio] Data not ready");
-	// }
-}
-
-bool computeInverseDynamics::normalizeData(aliengo_dynamics_computer::FootForces force, aliengo_dynamics_computer::FootForces& normalized_force)
-{
-  // aliengo_dynamics_computer::FootForces normalized_force;
-  if(normalized_force_.size() == 0)
-  {
-    for(int i=0; i<4; i++)
-    {
-      normalized_force_.push_back(DataNormalizer(100));
-    }
-  }
-
-  //check if data is initialized
-  if(normalized_force_[FootNumber::FL].isDataReady() 
-  && normalized_force_[FootNumber::FR].isDataReady() 
-  && normalized_force_[FootNumber::RL].isDataReady() 
-  && normalized_force_[FootNumber::RR].isDataReady())
-  {
-    //normalize the data
-    normalized_force.FL_foot = normalized_force_[FootNumber::FL].normalizeData(force.FL_foot);
-    normalized_force.FR_foot = normalized_force_[FootNumber::FR].normalizeData(force.FR_foot);
-    normalized_force.RL_foot = normalized_force_[FootNumber::RL].normalizeData(force.RL_foot);
-    normalized_force.RR_foot = normalized_force_[FootNumber::RR].normalizeData(force.RR_foot);
-
-	double min=0, max=0;
-	normalized_force_[FootNumber::FL].getNormalizationParams(min, max);
-	ROS_INFO("[pinocchio] Normalized force min: %lf, max: %lf", min, max);
-    return true;
-  }
-  else
-  {
-    normalized_force_[FootNumber::FL].addData(force.FL_foot);
-    normalized_force_[FootNumber::FR].addData(force.FR_foot);
-    normalized_force_[FootNumber::RL].addData(force.RL_foot);
-    normalized_force_[FootNumber::RR].addData(force.RR_foot);
-    // aliengo_dynamics_computer::FootForces
-    return false;
-  }
 }
