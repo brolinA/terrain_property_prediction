@@ -18,6 +18,7 @@
 //custom message
 #include <aliengo_dynamics_computer/FootForces.h>
 #include <aliengo_dynamics_computer/ReactionForce.h>
+#include <aliengo_dynamics_computer/data_normalizer.hpp>
 class forceTransformer
 {
 private:
@@ -103,9 +104,20 @@ private:
      */
     ros::Publisher foot_force_pub_;
 
-    ros::Publisher test_odom_pub_;
+    ros::Publisher test_odom_pub_, normalized_foot_force_pub_;
     ros::Subscriber odom_sub_;
     aliengo_dynamics_computer::FootForces magnitude_forces_g_;
+    std::vector<DataNormalizer> normalized_force_; //to hold normalized value
+    
+    enum FootNumber
+    {
+        FL = 0,
+        FR = 1,
+        RL = 2,
+        RR = 3
+    };
+
+    bool normalizeData(aliengo_dynamics_computer::FootForces force, aliengo_dynamics_computer::FootForces& normalized_force);
 
     void odometryCallback(const nav_msgs::Odometry::ConstPtr& odom_data);
     //create functions

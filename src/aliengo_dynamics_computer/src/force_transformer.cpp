@@ -18,6 +18,7 @@ forceTransformer::forceTransformer(/* args */)
   footSynchronizer->registerCallback(boost::bind(&forceTransformer::footSynchronizerCallback, this, _1, _2, _3, _4));
   reaction_force_pub_ = nh_.advertise<aliengo_dynamics_computer::ReactionForce>("gazebo_leg_forces_components", 2);
   foot_force_pub_ = nh_.advertise<aliengo_dynamics_computer::FootForces>("gazebo_leg_forces_magnitude", 2);
+  normalized_foot_force_pub_ = nh_.advertise<aliengo_dynamics_computer::FootForces>("normalized_gazebo_leg_forces_magnitude", 2);
   test_odom_pub_ = nh_.advertise<nav_msgs::Odometry>("/test_odom", 2);
   odom_sub_ = nh_.subscribe("/odom", 10, &forceTransformer::odometryCallback, this);
 
@@ -60,6 +61,7 @@ void forceTransformer::footSynchronizerCallback(const geometry_msgs::WrenchStamp
 {
   aliengo_dynamics_computer::ReactionForce component_reaction_forces;
   aliengo_dynamics_computer::FootForces magnitude_forces;
+  aliengo_dynamics_computer::FootForces normalized_magnitude_forces;
 
   //transform force for every leg
   transformForce(*foot1, component_reaction_forces, magnitude_forces.FL_foot);
@@ -68,13 +70,26 @@ void forceTransformer::footSynchronizerCallback(const geometry_msgs::WrenchStamp
   transformForce(*foot4, component_reaction_forces, magnitude_forces.RR_foot);
   // ROS_INFO("Total Magnitude: %lf", (magnitude_forces.FL_foot+magnitude_forces.FR_foot+magnitude_forces.RL_foot+magnitude_forces.RR_foot));
   // ROS_INFO("--------------------------");
-  magnitude_forces_g_ = magnitude_forces;
+ 
   //publish force
 	component_reaction_forces.header.stamp = ros::Time::now();
 	magnitude_forces.header.stamp = ros::Time::now();
   magnitude_forces.header.frame_id = base_frame_;
   reaction_force_pub_.publish(component_reaction_forces);
   foot_force_pub_.publish(magnitude_forces);
+
+  if(normalizeData(magnitude_forces, normalized_magnitude_forces))
+  {
+    //publish the normalized force
+    normalized_magnitude_forces.header.stamp = ros::Time::now();
+    normalized_magnitude_forces.header.frame_id = base_frame_;
+    normalized_foot_force_pub_.publish(normalized_magnitude_forces);
+    magnitude_forces_g_ = normalized_magnitude_forces;
+  }
+  // else
+  // {
+  //   ROS_INFO("[Gazebo] Data not ready");
+  // }
 }
 
 geometry_msgs::TransformStamped forceTransformer::getTransformation(std::string source_frame, std::string target_frame)
@@ -131,3 +146,42 @@ void forceTransformer::transformForce(geometry_msgs::WrenchStamped foot_force, a
 
   // ROS_INFO("Mag %s : %lf", foot_force.header.frame_id.c_str(), magnitude);
 } 
+
+bool forceTransformer::normalizeData(aliengo_dynamics_computer::FootForces force, aliengo_dynamics_computer::FootForces& normalized_force)
+{
+  // aliengo_dynamics_computer::FootForces normalized_force;
+  if(normalized_force_.size() == 0)
+  {
+    for(int i=0; i<4; i++)
+    {
+      normalized_force_.push_back(DataNormalizer(100));
+    }
+  }
+
+  //check if data is initialized
+  if(normalized_force_[FootNumber::FL].isDataReady() 
+  && normalized_force_[FootNumber::FR].isDataReady() 
+  && normalized_force_[FootNumber::RL].isDataReady() 
+  && normalized_force_[FootNumber::RR].isDataReady())
+  {
+    //normalize the data
+    normalized_force.FL_foot = normalized_force_[FootNumber::FL].normalizeData(force.FL_foot);
+    normalized_force.FR_foot = normalized_force_[FootNumber::FR].normalizeData(force.FR_foot);
+    normalized_force.RL_foot = normalized_force_[FootNumber::RL].normalizeData(force.RL_foot);
+    normalized_force.RR_foot = normalized_force_[FootNumber::RR].normalizeData(force.RR_foot);
+    
+    double min=0, max=0;
+    normalized_force_[FootNumber::FL].getNormalizationParams(min, max);
+	  ROS_INFO("[gazebo] Normalized force min: %lf, max: %lf", min, max);
+    return true;
+  }
+  else
+  {
+    normalized_force_[FootNumber::FL].addData(force.FL_foot);
+    normalized_force_[FootNumber::FR].addData(force.FR_foot);
+    normalized_force_[FootNumber::RL].addData(force.RL_foot);
+    normalized_force_[FootNumber::RR].addData(force.RR_foot);
+    // aliengo_dynamics_computer::FootForces
+    return false;
+  }
+}

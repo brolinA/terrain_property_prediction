@@ -26,6 +26,7 @@
 #include <aliengo_dynamics_computer/ReactionForce.h>
 #include <aliengo_dynamics_computer/FootForces.h>
 #include <aliengo_dynamics_computer/PinocchioDebug.h>
+#include <aliengo_dynamics_computer/data_normalizer.hpp>
 
 using namespace pinocchio;
 
@@ -144,6 +145,19 @@ private:
 
     ros::Publisher pinocchio_debug_pub_; //!< publish the force as x,y,z components per leg
 
+    std::vector<DataNormalizer> normalized_force_; //!< vector to store the forces for each leg
+
+    ros::Publisher normalized_force_pub_; //!< publish the force as x,y,z components per leg
+
+    enum FootNumber
+    {
+        FL = 0,
+        FR = 1,
+        RL = 2,
+        RR = 3
+    };
+
+    bool normalizeData(aliengo_dynamics_computer::FootForces force, aliengo_dynamics_computer::FootForces& normalized_force);
 
     //Function definitions
 
