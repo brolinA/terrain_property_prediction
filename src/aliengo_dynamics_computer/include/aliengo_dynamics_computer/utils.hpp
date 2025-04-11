@@ -3,6 +3,8 @@
 
 //custom message
 #include <aliengo_dynamics_computer/ReactionForce.h>
+#include <aliengo_dynamics_computer/FootForces.h>
+#include <aliengo_dynamics_computer/data_normalizer.hpp>
 
 class utilFunction
 {
@@ -113,5 +115,97 @@ void vectorToForceMsg(std::vector<std::string> contact_points, Eigen::VectorXd f
 	}
 }
 
+bool normalizeComponentData(std::vector<DataNormalizer>& data_normalizer, aliengo_dynamics_computer::ReactionForce component_forces, 
+		aliengo_dynamics_computer::ReactionForce& normalized_component_forces)
+{
+	if(data_normalizer.empty())
+	{
+		ROS_WARN("Data normalizer is empty. Please initialize the data normalizer.");
+		return false;
+	}
+
+	//check if data is initialized
+	bool is_data_ready = true;
+	for(int i=0; i<12; i++)
+	{
+		if(!data_normalizer[i].isDataReady())
+		{
+			is_data_ready = false;
+			break; //exit the loop if any of the data is not ready
+		}
+	}
+
+	if(!is_data_ready)
+	{
+		//add the data to the vector
+		int idx = 0;
+		for (auto component:component_forces.reaction_forces)
+		{
+			data_normalizer[idx].addData(component.wrench.force.x);
+			data_normalizer[idx+1].addData(component.wrench.force.y);
+			data_normalizer[idx+2].addData(component.wrench.force.z);
+			idx += 3;
+		}
+		return false;
+	}
+	else
+	{
+		//normalize the data
+		int idx = 0;
+		for (auto component:component_forces.reaction_forces)
+		{
+			geometry_msgs::WrenchStamped normalized_component;
+			normalized_component.header.frame_id = component.header.frame_id;
+
+			normalized_component.wrench.force.x = data_normalizer[idx].normalizeData(component.wrench.force.x);
+			normalized_component.wrench.force.y = data_normalizer[idx+1].normalizeData(component.wrench.force.y);
+			normalized_component.wrench.force.z = data_normalizer[idx+2].normalizeData(component.wrench.force.z);
+			normalized_component_forces.reaction_forces.push_back(normalized_component);
+			idx += 3;
+		}
+		return true;
+	}
+}
+
+bool normalizeMagnitudeData(std::vector<DataNormalizer>& data_normalizer, aliengo_dynamics_computer::FootForces force, 
+							aliengo_dynamics_computer::FootForces& normalized_force)
+{
+
+	if(data_normalizer.empty())
+	{
+		ROS_WARN("Data normalizer is empty. Please initialize the data normalizer.");
+		return false;
+	}
+	
+	enum FootNumber	{
+		FL = 0, FR = 1, RL = 2, RR = 3
+	};
+
+	if(data_normalizer.size() == 0){
+		
+	}
+
+	//check if data is initialized
+	if(data_normalizer[FootNumber::FL].isDataReady() 
+	&& data_normalizer[FootNumber::FR].isDataReady() 
+	&& data_normalizer[FootNumber::RL].isDataReady() 
+	&& data_normalizer[FootNumber::RR].isDataReady())
+	{
+		//normalize the data
+		normalized_force.FL_foot = data_normalizer[FootNumber::FL].normalizeData(force.FL_foot);
+		normalized_force.FR_foot = data_normalizer[FootNumber::FR].normalizeData(force.FR_foot);
+		normalized_force.RL_foot = data_normalizer[FootNumber::RL].normalizeData(force.RL_foot);
+		normalized_force.RR_foot = data_normalizer[FootNumber::RR].normalizeData(force.RR_foot);
+		return true;
+	}
+	else
+	{
+		data_normalizer[FootNumber::FL].addData(force.FL_foot);
+		data_normalizer[FootNumber::FR].addData(force.FR_foot);
+		data_normalizer[FootNumber::RL].addData(force.RL_foot);
+		data_normalizer[FootNumber::RR].addData(force.RR_foot);
+		return false;
+	}
+}
 };
 #endif //UTILS_HPP
