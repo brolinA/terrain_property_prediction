@@ -16,6 +16,7 @@
 #include <message_filters/synchronizer.h>
 #include <message_filters/sync_policies/approximate_time.h>
 //custom message
+#include "aliengo_dynamics_computer/utils.hpp"
 #include <aliengo_dynamics_computer/FootForces.h>
 #include <aliengo_dynamics_computer/ReactionForce.h>
 #include <aliengo_dynamics_computer/data_normalizer.hpp>
@@ -104,20 +105,19 @@ private:
      */
     ros::Publisher foot_force_pub_;
 
-    ros::Publisher test_odom_pub_, normalized_foot_force_pub_;
-    ros::Subscriber odom_sub_;
-    aliengo_dynamics_computer::FootForces magnitude_forces_g_;
-    std::vector<DataNormalizer> normalized_force_; //to hold normalized value
-    
-    enum FootNumber
-    {
-        FL = 0,
-        FR = 1,
-        RL = 2,
-        RR = 3
-    };
+    ros::Publisher normalized_foot_force_pub_ ; //!< publish the normalized force per leg
 
-    bool normalizeData(aliengo_dynamics_computer::FootForces force, aliengo_dynamics_computer::FootForces& normalized_force);
+    ros::Publisher normalized_foot_component_pub_; //!< publish the normalized force as x,y,z components per leg
+
+    ros::Publisher test_odom_pub_ ; //!< publish the test odom data
+    ros::Subscriber odom_sub_; //!< subscriber to odom topic
+    aliengo_dynamics_computer::FootForces magnitude_forces_g_; //test variable. To be removed later
+    
+    std::vector<DataNormalizer> normalized_force_magnitude_; //to hold normalized magnitude value
+
+    std::vector<DataNormalizer> normalized_force_component_; //to hold normalized componet value
+
+    // utilFunction util_func_; //!< object to access some utility functions
 
     void odometryCallback(const nav_msgs::Odometry::ConstPtr& odom_data);
     //create functions

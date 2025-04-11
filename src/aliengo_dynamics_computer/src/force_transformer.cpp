@@ -6,6 +6,12 @@ forceTransformer::forceTransformer(/* args */)
   //load all the variables
   loadParams();
 
+  //initialize the vectors
+  for(int i=0; i<12; i++) //3 components for each leg
+		normalized_force_component_.push_back(DataNormalizer(100));
+	for(int i=0; i<4; i++) //4 total legs
+		normalized_force_magnitude_.push_back(DataNormalizer(100));
+
   tf_listener_ = new tf2_ros::TransformListener(tf_buffer_);
   //initialize the synchronizer
   foot_1_ = new message_filters::Subscriber<geometry_msgs::WrenchStamped>(nh_, foot_topics_[0], 1);
@@ -60,6 +66,7 @@ void forceTransformer::footSynchronizerCallback(const geometry_msgs::WrenchStamp
                                   const geometry_msgs::WrenchStampedConstPtr& foot3, const geometry_msgs::WrenchStampedConstPtr& foot4)
 {
   aliengo_dynamics_computer::ReactionForce component_reaction_forces;
+  aliengo_dynamics_computer::ReactionForce normalized_component_reaction_forces;
   aliengo_dynamics_computer::FootForces magnitude_forces;
   aliengo_dynamics_computer::FootForces normalized_magnitude_forces;
 
@@ -78,7 +85,8 @@ void forceTransformer::footSynchronizerCallback(const geometry_msgs::WrenchStamp
   reaction_force_pub_.publish(component_reaction_forces);
   foot_force_pub_.publish(magnitude_forces);
 
-  if(normalizeData(magnitude_forces, normalized_magnitude_forces))
+  //normalized magnitude values
+  if(util_func_.normalizeMagnitudeData(normalized_force_magnitude_, magnitude_forces, normalized_magnitude_forces))
   {
     //publish the normalized force
     normalized_magnitude_forces.header.stamp = ros::Time::now();
@@ -86,10 +94,15 @@ void forceTransformer::footSynchronizerCallback(const geometry_msgs::WrenchStamp
     normalized_foot_force_pub_.publish(normalized_magnitude_forces);
     magnitude_forces_g_ = normalized_magnitude_forces;
   }
-  // else
-  // {
-  //   ROS_INFO("[Gazebo] Data not ready");
-  // }
+
+  //normalize the force components and publish
+	if(util_func_.normalizeComponentData(normalized_force_component_, component_reaction_forces, normalized_component_reaction_forces))
+	{
+		//publish the normalized force
+		normalized_component_reaction_forces.header.stamp = ros::Time::now();
+		normalized_component_reaction_forces.header.frame_id = base_frame_;
+		normalized_foot_component_pub_.publish(normalized_component_reaction_forces);
+	}
 }
 
 geometry_msgs::TransformStamped forceTransformer::getTransformation(std::string source_frame, std::string target_frame)
@@ -147,41 +160,38 @@ void forceTransformer::transformForce(geometry_msgs::WrenchStamped foot_force, a
   // ROS_INFO("Mag %s : %lf", foot_force.header.frame_id.c_str(), magnitude);
 } 
 
-bool forceTransformer::normalizeData(aliengo_dynamics_computer::FootForces force, aliengo_dynamics_computer::FootForces& normalized_force)
-{
-  // aliengo_dynamics_computer::FootForces normalized_force;
-  if(normalized_force_.size() == 0)
-  {
-    for(int i=0; i<4; i++)
-    {
-      normalized_force_.push_back(DataNormalizer(100));
-    }
-  }
+// bool forceTransformer::normalizeData(aliengo_dynamics_computer::FootForces force, aliengo_dynamics_computer::FootForces& normalized_force)
+// {
+//   // aliengo_dynamics_computer::FootForces normalized_force;
+//   if(normalized_force_.size() == 0)
+//   {
+//     for(int i=0; i<4; i++)
+//     {
+//       normalized_force_.push_back(DataNormalizer(100));
+//     }
+//   }
 
-  //check if data is initialized
-  if(normalized_force_[FootNumber::FL].isDataReady() 
-  && normalized_force_[FootNumber::FR].isDataReady() 
-  && normalized_force_[FootNumber::RL].isDataReady() 
-  && normalized_force_[FootNumber::RR].isDataReady())
-  {
-    //normalize the data
-    normalized_force.FL_foot = normalized_force_[FootNumber::FL].normalizeData(force.FL_foot);
-    normalized_force.FR_foot = normalized_force_[FootNumber::FR].normalizeData(force.FR_foot);
-    normalized_force.RL_foot = normalized_force_[FootNumber::RL].normalizeData(force.RL_foot);
-    normalized_force.RR_foot = normalized_force_[FootNumber::RR].normalizeData(force.RR_foot);
+//   //check if data is initialized
+//   if(normalized_force_[FootNumber::FL].isDataReady() 
+//   && normalized_force_[FootNumber::FR].isDataReady() 
+//   && normalized_force_[FootNumber::RL].isDataReady() 
+//   && normalized_force_[FootNumber::RR].isDataReady())
+//   {
+//     //normalize the data
+//     normalized_force.FL_foot = normalized_force_[FootNumber::FL].normalizeData(force.FL_foot);
+//     normalized_force.FR_foot = normalized_force_[FootNumber::FR].normalizeData(force.FR_foot);
+//     normalized_force.RL_foot = normalized_force_[FootNumber::RL].normalizeData(force.RL_foot);
+//     normalized_force.RR_foot = normalized_force_[FootNumber::RR].normalizeData(force.RR_foot);
     
-    double min=0, max=0;
-    normalized_force_[FootNumber::FL].getNormalizationParams(min, max);
-	  ROS_INFO("[gazebo] Normalized force min: %lf, max: %lf", min, max);
-    return true;
-  }
-  else
-  {
-    normalized_force_[FootNumber::FL].addData(force.FL_foot);
-    normalized_force_[FootNumber::FR].addData(force.FR_foot);
-    normalized_force_[FootNumber::RL].addData(force.RL_foot);
-    normalized_force_[FootNumber::RR].addData(force.RR_foot);
-    // aliengo_dynamics_computer::FootForces
-    return false;
-  }
-}
+//     return true;
+//   }
+//   else
+//   {
+//     normalized_force_[FootNumber::FL].addData(force.FL_foot);
+//     normalized_force_[FootNumber::FR].addData(force.FR_foot);
+//     normalized_force_[FootNumber::RL].addData(force.RL_foot);
+//     normalized_force_[FootNumber::RR].addData(force.RR_foot);
+//     // aliengo_dynamics_computer::FootForces
+//     return false;
+//   }
+// }
