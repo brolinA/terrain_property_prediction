@@ -117,7 +117,7 @@ private:
 
     std::vector<DataNormalizer> normalized_force_component_; //to hold normalized componet value
 
-    // utilFunction util_func_; //!< object to access some utility functions
+    utilFunction util_func_; //!< object to access some utility functions
 
     void odometryCallback(const nav_msgs::Odometry::ConstPtr& odom_data);
     //create functions

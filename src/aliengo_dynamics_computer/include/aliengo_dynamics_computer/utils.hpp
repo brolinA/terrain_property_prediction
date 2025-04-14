@@ -2,6 +2,7 @@
 #define UTILS_HPP
 
 //custom message
+#include <eigen3/Eigen/Dense>
 #include <aliengo_dynamics_computer/ReactionForce.h>
 #include <aliengo_dynamics_computer/FootForces.h>
 #include <aliengo_dynamics_computer/data_normalizer.hpp>
@@ -176,7 +177,7 @@ bool normalizeMagnitudeData(std::vector<DataNormalizer>& data_normalizer, alieng
 		ROS_WARN("Data normalizer is empty. Please initialize the data normalizer.");
 		return false;
 	}
-	
+
 	enum FootNumber	{
 		FL = 0, FR = 1, RL = 2, RR = 3
 	};
