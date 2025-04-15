@@ -1,4 +1,32 @@
-.vscode
+.neptune*
+wild_visual_navigation/.neptune*
+wild_visual_navigation/notebooks*
+wild_visual_navigation_ros/output*
+results/*
+assets/dino/*
+assets/stego/cocostuff27_vit_base_5.ckpt
+.pytest_cache/**
+.vscode/**
+notebooks/**
+*.code-workspace
+
+# DrawIO
+**.dtmp
+**.bkp 
+
+# Pip editable repos
+src/
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
 build/
 devel/
 logs/

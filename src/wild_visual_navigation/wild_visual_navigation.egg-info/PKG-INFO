@@ -1,0 +1,38 @@
+Metadata-Version: 2.1
+Name: wild_visual_navigation
+Version: 0.0.1
+Summary: A small example package
+Author: Jonas Frey, Matias Mattamala
+Author-email: jonfrey@ethz.ch, matias@robots.oex.ac.uk
+Requires-Python: >=3.7
+License-File: LICENSE
+Requires-Dist: numpy
+Requires-Dist: tqdm
+Requires-Dist: kornia>=0.6.5
+Requires-Dist: pip
+Requires-Dist: torchvision
+Requires-Dist: torch>=1.21
+Requires-Dist: torchmetrics
+Requires-Dist: pytorch_lightning>=1.6.5
+Requires-Dist: pytest
+Requires-Dist: scipy
+Requires-Dist: scikit-image
+Requires-Dist: scikit-learn
+Requires-Dist: matplotlib
+Requires-Dist: seaborn
+Requires-Dist: pandas
+Requires-Dist: pytictac
+Requires-Dist: torch_geometric
+Requires-Dist: omegaconf
+Requires-Dist: optuna
+Requires-Dist: neptune
+Requires-Dist: fast-slic
+Requires-Dist: hydra-core
+Requires-Dist: prettytable
+Requires-Dist: termcolor
+Requires-Dist: pydensecrf@ git+https://github.com/lucasb-eyer/pydensecrf.git
+Requires-Dist: liegroups@ git+https://github.com/mmattamala/liegroups
+Requires-Dist: wget
+Requires-Dist: rospkg
+Requires-Dist: wandb
+Requires-Dist: opencv-python>=4.6
