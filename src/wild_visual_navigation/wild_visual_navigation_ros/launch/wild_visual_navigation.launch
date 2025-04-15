@@ -15,7 +15,10 @@
   <rosparam command="load" file="$(arg camera_file)" ns="wvn_feature_extractor_node"/>
 
   <!-- Launch node -->
-  <node name="wvn_learning_node" pkg="wild_visual_navigation_ros" type="wvn_learning_node.py" output="screen">
+  <!-- <node name="wvn_learning_node" pkg="wild_visual_navigation_ros" type="wvn_learning_node.py" output="screen">
+    <param name="reload_default_params" value="False" />
+  </node> -->
+  <node name="wvn_learning_node" pkg="wild_visual_navigation_ros" type="force_wvn_learning_node.py" output="screen">
     <param name="reload_default_params" value="False" />
   </node>
 
