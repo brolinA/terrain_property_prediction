@@ -7,3 +7,4 @@ logs/
 src/anymal*
 src/wild_visual_navigation/
 src/procman_ros/
+rqt_plot_data/**

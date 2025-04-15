@@ -1,6 +1,7 @@
 # Input topics
 robot_state_topic: "/wild_visual_navigation_node/robot_state"
 desired_twist_topic: "/wild_visual_navigation_node/reference_twist"
+desired_force_topic: "/normalized_gazebo_leg_forces_component"
 
 # Relevant frames
 fixed_frame: odom
