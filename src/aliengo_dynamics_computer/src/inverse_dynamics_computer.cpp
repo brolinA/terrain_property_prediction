@@ -27,7 +27,7 @@ computeInverseDynamics::computeInverseDynamics(std::string robot_model_path)
   joint_data_sub_ = nh_.subscribe("/joint_states", 10, &computeInverseDynamics::jointDataCallback, this);
   odom_sub_ = nh_.subscribe("/odom", 10, &computeInverseDynamics::odometryCallback, this);
   
-	ROS_INFO("Successfully initialized");
+	ROS_INFO("Successfully initialized pinocchio force transformer");
 }
 
 computeInverseDynamics::~computeInverseDynamics()
