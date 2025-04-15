@@ -446,7 +446,6 @@ class WvnLearning:
         if not self._setup_ready:
             return
 
-        # print("Robot state callback recieved ---->>> ")
         self._system_events["robot_state_callback_received"] = {
             "time": time_func(),
             "value": "message received",
@@ -499,11 +498,10 @@ class WvnLearning:
             supervision_tensor, supervision_labels = rc.wvn_robot_state_to_torch(
                 state_msg, device=self._ros_params.device
             )
-            # current_twist_tensor = rc.twist_stamped_to_torch(state_msg.twist, device=self._ros_params.device)
-            current_force_tensor = rc.robot_force_state_to_torch(state_msg, device=self._ros_params.device)
-            # desired_twist_tensor = rc.twist_stamped_to_torch(desired_twist_msg, device=self._ros_params.device)
-            desired_force_tensor = rc.reaction_force_to_torch(desired_force_msg.reaction_forces, components=["FLz", "FRz", "RLz", "RRz"],
-                                                                 device=self._ros_params.device)
+
+            force_components = ["FLz", "FRz", "RLz", "RRz"]
+            current_force_tensor = rc.robot_force_state_to_torch(state_msg, components=force_components, device=self._ros_params.device)
+            desired_force_tensor = rc.reaction_force_to_torch(desired_force_msg.reaction_forces, components= force_components, device=self._ros_params.device)
 
             # Update traversability
             (
@@ -512,29 +510,6 @@ class WvnLearning:
                 is_untraversable,
                 
             ) = self._supervision_generator.update_force_tracking(current_force_tensor, desired_force_tensor)
-
-            # self._supervision_generator.update_velocity_tracking(
-            #     current_force_tensor, desired_force_tensor, max_velocity=1.0, velocities=["vx", "vy"] )
-            
-            
-            # print(f"traversibility{traversability}")
-
-
-            # Create supervision node for the graph
-            # supervision_node = SupervisionNode(
-            #     timestamp=ts,
-            #     pose_base_in_world=pose_base_in_world,
-            #     pose_footprint_in_base=pose_footprint_in_base,
-            #     twist_in_base=current_twist_tensor,
-            #     desired_twist_in_base=desired_twist_tensor,
-            #     width=self._ros_params.robot_width,
-            #     length=self._ros_params.robot_length,
-            #     height=self._ros_params.robot_height,
-            #     supervision=supervision_tensor,
-            #     traversability=traversability,
-            #     traversability_var=traversability_var,
-            #     is_untraversable=is_untraversable,
-            # )
 
             supervision_node = SupervisionNode(
                 timestamp=ts,
