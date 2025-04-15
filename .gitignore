@@ -5,6 +5,6 @@ logs/
 .catkin_tools
 .DS_Store
 src/anymal*
-src/wild_visual_navigation/
+# src/wild_visual_navigation/
 src/procman_ros/
 rqt_plot_data/**
