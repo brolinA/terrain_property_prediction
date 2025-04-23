@@ -88,7 +88,7 @@
   <!-- Foot contacts. -->
   <gazebo reference="FR_calf">
     <sensor name="FR_foot_contact" type="contact">
-      <update_rate>20</update_rate>
+      <update_rate>200</update_rate>
       <plugin filename="libunitreeFootContactPlugin.so" name="contactPlugin">
         <frameId>FR_calf</frameId>
       </plugin>
@@ -99,7 +99,7 @@
   </gazebo>
   <gazebo reference="FL_calf">
     <sensor name="FL_foot_contact" type="contact">
-      <update_rate>20</update_rate>
+      <update_rate>200</update_rate>
       <plugin filename="libunitreeFootContactPlugin.so" name="contactPlugin">
         <frameId>FL_calf</frameId>
       </plugin>
@@ -110,7 +110,7 @@
   </gazebo>
   <gazebo reference="RR_calf">
     <sensor name="RR_foot_contact" type="contact">
-      <update_rate>20</update_rate>
+      <update_rate>200</update_rate>
       <plugin filename="libunitreeFootContactPlugin.so" name="contactPlugin">
         <frameId>RR_calf</frameId>
       </plugin>
@@ -121,7 +121,7 @@
   </gazebo>
   <gazebo reference="RL_calf">
     <sensor name="RL_foot_contact" type="contact">
-      <update_rate>20</update_rate>
+      <update_rate>200</update_rate>
       <plugin filename="libunitreeFootContactPlugin.so" name="contactPlugin">
         <frameId>RL_calf</frameId>
       </plugin>
