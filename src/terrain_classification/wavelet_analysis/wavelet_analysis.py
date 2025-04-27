@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import pywt
 import os
 import math
-from data_extractor.data_extractor import DataExtractor
+from terrain_classification.data_extractor.data_extractor import DataExtractor
 
 class WaveletAnalysis:
     def __init__(self, wavelet_type='db4'):
