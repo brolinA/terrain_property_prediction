@@ -4,13 +4,14 @@ import matplotlib.pyplot as plt
 import os
 
 class DataExtractor:
-    def __init__(self, file_path):
-        self.file_path = file_path
+    def __init__(self):
+        self.file_path = None
         self.data = None
         self.steps = {} #dict to store steps for each leg
 
+    def load_data(self, file_path):
         """Load data from the CSV file and preprocess it."""
-        self.data = pd.read_csv(self.file_path)
+        self.data = pd.read_csv(file_path)
 
         # Strip leading/trailing spaces from column names
         self.data.columns = self.data.columns.str.strip()
@@ -162,7 +163,8 @@ def run_data_extractor():
     file_path = os.path.join(parent_dir, 'data/sand/trial4.csv')
     # print(f"[DataExtractor] File path: {file_path}")
 
-    data_extractor = DataExtractor(file_path)
+    data_extractor = DataExtractor()
+    data_extractor.load_data(file_path)
     data_extractor.preprocess_data(exclude_colunms=['time'])
     data_extractor.extract_steps(legs=['fl', 'rl'], components=['x', 'y', 'z'])
     # data_extractor.plot_original_signal('fl-z')

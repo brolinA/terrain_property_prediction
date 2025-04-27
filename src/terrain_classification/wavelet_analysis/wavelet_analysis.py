@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import pywt
 import os
 import math
-from ..data_extractor.data_extractor import DataExtractor
+from data_extractor.data_extractor import DataExtractor
 
 class WaveletAnalysis:
     def __init__(self, wavelet_type='db4'):
@@ -26,7 +26,8 @@ class WaveletAnalysis:
         """Perform wavelet analysis on each segment."""
         # wavelet_type = 'db4'
         # Perform Discrete Wavelet Decomposition
-        max_level = pywt.dwt_max_level(len(signal), pywt.Wavelet(self.wavelet_type).dec_len)
+        max_level = 3
+        # max_level = pywt.dwt_max_level(len(signal), pywt.Wavelet(self.wavelet_type).dec_len)
         coeffs = pywt.wavedec(signal, self.wavelet_type, level=max_level)
 
             # Reconstruct detail coefficients at each level
@@ -81,7 +82,8 @@ def run_WaveletAnalysis():
     parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
     file_path = os.path.join(parent_dir, 'data/sand/trial4.csv')
     
-    data_extractor = DataExtractor(file_path)
+    data_extractor = DataExtractor()
+    data_extractor.load_data(file_path)
     data_extractor.preprocess_data(exclude_colunms=['time'])
     data_extractor.extract_steps(legs=['fl', 'rl'], components=['x', 'y', 'z'])
     # data_extractor.plot_steps('fl-z')
