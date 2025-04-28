@@ -12,22 +12,25 @@ class WaveletAnalysis:
         self.input_signal = None
         self.wavelet_results = []
 
-    def perform_analysis(self, input_signals):
+    def perform_analysis(self, input_signals, level=None):
         """Perform wavelet analysis on the input signals."""
         self.input_signal = input_signals
 
         for signal in input_signals:
-            extracted_details = self.extract_details(signal)
+            extracted_details = self.extract_details(signal, level=level)
             self.wavelet_results.append(extracted_details)
 
         return self.wavelet_results
 
-    def extract_details(self, signal):
+    def extract_details(self, signal, level=None):
         """Perform wavelet analysis on each segment."""
         # wavelet_type = 'db4'
         # Perform Discrete Wavelet Decomposition
-        max_level = 3
-        # max_level = pywt.dwt_max_level(len(signal), pywt.Wavelet(self.wavelet_type).dec_len)
+        if level is None:
+            max_level = pywt.dwt_max_level(len(signal), pywt.Wavelet(self.wavelet_type).dec_len)
+        else:
+            max_level = level
+
         coeffs = pywt.wavedec(signal, self.wavelet_type, level=max_level)
 
             # Reconstruct detail coefficients at each level
