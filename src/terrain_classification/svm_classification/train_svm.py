@@ -8,6 +8,8 @@ from sklearn import svm
 from sklearn.model_selection import train_test_split, GridSearchCV
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import classification_report, accuracy_score
+from joblib import dump
+from datetime import datetime
 
 class SVMClassification:
     def __init__(self, data_paths):
@@ -42,8 +44,6 @@ class SVMClassification:
             self.data_extractor.preprocess_data()  # Preprocess the data
     
             # Extract steps from the data
-            # legs = ['fl', 'fr', 'rl', 'rr']
-            # components = ['x', 'y', 'z']
             self.data_extractor.extract_steps(normalize_data=normalize_data,
                                             legs=legs, 
                                             components=components)
@@ -59,6 +59,68 @@ class SVMClassification:
         self.labels = np.array(self.labels)
         # print(f"Feature matrix shape: {self.feature_matrix.shape}")
         # print(f"Labels shape: {self.labels.shape}")
+    
+    def train_classifier(self, C=1, gamma=0.1, find_best_parameters=False, save_model=True, parent_dir=None):
+        # Split into train/test
+        X_train, X_test, y_train, y_test = train_test_split(self.feature_matrix, self.labels, test_size=0.2, random_state=42)
+        
+        #check data distribution
+        unique_labels, label_counts = np.unique(y_train, return_counts=True)
+        for label, count in zip(unique_labels, label_counts):
+            print(f"Label {label}: {count} samples")
+        # return
+        # Feature scaling (VERY important for SVM)
+        scaler = StandardScaler()
+        X_train = scaler.fit_transform(X_train)
+        X_test = scaler.transform(X_test)
+        print(f"X_train shape: {X_train.shape}")
+        print(f"X_test shape: {X_test.shape}")
+
+        # Set up the SVM and parameter grid
+        current_time = datetime.now().strftime("%Y%m%d_%H%M%S")
+
+        if find_best_parameters:
+            print("\nFinding best parameters...")
+            svc = svm.SVC(verbose=False)
+            param_grid = {
+                'C': [0.1, 1, 10, 100],          # Regularization parameter
+                # 'gamma': [1, 0.1],  # Kernel coefficient
+                'gamma': [1, 0.1, 0.01, 0.001],  # Kernel coefficient
+                'kernel': ['rbf']      # Try both RBF and Linear kernels
+                # 'kernel': ['rbf', 'linear']      # Try both RBF and Linear kernels
+            }
+
+            # Grid Search with 5-fold cross-validation
+            grid = GridSearchCV(svc, param_grid, refit=True, verbose=2, cv=5, n_jobs=-1, error_score='raise')
+            grid.fit(X_train, y_train) # Train
+            print(f"\nBest Parameters found: {grid.best_params_}")
+            y_pred = grid.predict(X_test) # Predict using the best model
+
+            # Save the best model
+            if save_model:
+                best_model = grid.best_estimator_
+                model_path = os.path.join(parent_dir, f"models/svm_model_c{grid.best_params_['C']}_gamma{grid.best_params_['gamma']}_{current_time}.joblib")
+                dump(best_model, model_path)
+                print(f"Best model saved to {model_path}")
+
+        else:
+            # c = 10; gamma = 0.001
+            print("\nTraining SVM with fixed parameters...")
+            svc = svm.SVC(C=C, gamma=gamma, kernel='rbf')
+            # Train the SVM
+            svc.fit(X_train, y_train)
+            # Predict
+            y_pred = svc.predict(X_test)
+            
+            if save_model:
+                # Save the model
+                model_path = os.path.join(parent_dir, f"models/svm_model_c{C}_gamma{gamma}_{current_time}.joblib")
+                dump(svc, model_path)
+                print(f"Model saved to {model_path}")
+
+        # Evaluate
+        print("\nClassification Report:")
+        print(classification_report(y_test, y_pred))
 
 def run_classification_test():
     # Sample data paths for testing
@@ -67,10 +129,15 @@ def run_classification_test():
         os.path.join(parent_dir,'data/sand/trial1.csv'): 'sand',
         os.path.join(parent_dir,'data/sand/trial2.csv'): 'sand',
         os.path.join(parent_dir,'data/sand/trial3.csv'): 'sand',
-        os.path.join(parent_dir,'data/sand/trial4.csv'): 'sand',
-        os.path.join(parent_dir,'data/concrete/trial1.csv'): 'concrete',
-        os.path.join(parent_dir,'data/concrete/trial2.csv'): 'concrete',
-        os.path.join(parent_dir,'data/gravel/trial1.csv'): 'gravel'
+        # os.path.join(parent_dir,'data/sand/trial4.csv'): 'sand',
+        os.path.join(parent_dir,'data/concrete/trial1.csv'): 'concrete', 
+        # os.path.join(parent_dir,'data/concrete/trial2.csv'): 'concrete', 
+        # os.path.join(parent_dir,'data/concrete/trial3.csv'): 'concrete', 
+        # os.path.join(parent_dir,'data/concrete/trial4.csv'): 'concrete', 
+        # os.path.join(parent_dir,'data/gravel/trial1.csv'): 'gravel',
+        # os.path.join(parent_dir,'data/gravel/trial2.csv'): 'gravel', 
+        # os.path.join(parent_dir,'data/gravel/trial3.csv'): 'gravel', 
+        os.path.join(parent_dir,'data/gravel/trial4.csv'): 'gravel', 
     }
 
     # Create an instance of the SVMClassification class
@@ -79,51 +146,12 @@ def run_classification_test():
     # Load the data
     svm_classifier.prepare_data(normalize_data=True,
                                 legs=['fl', 'fr', 'rl', 'rr'], 
-                                components=['x', 'y', 'z'])
+                                components=['x','y','z'])
     # svm_classifier.data_extractor.plot_steps('fl-x')  # Plot the steps for the 'fl-z' column
-
-    # Split into train/test
-    X_train, X_test, y_train, y_test = train_test_split(svm_classifier.feature_matrix, svm_classifier.labels, test_size=0.2, random_state=42)
-    # print(f"X_train shape: {X_train.shape}, y_train shape: {y_train.shape}")
+    # Train the classifier
+    svm_classifier.train_classifier(C=10, gamma=0.001, find_best_parameters=False, 
+                                    save_model=True, parent_dir=parent_dir)
     
-    # Feature scaling (VERY important for SVM)
-    scaler = StandardScaler()
-    X_train = scaler.fit_transform(X_train)
-    X_test = scaler.transform(X_test)
-
-    find_best_parameters = False
-    # Set up the SVM and parameter grid
-    
-    if find_best_parameters:
-        print("\nFinding best parameters...")
-        svc = svm.SVC(verbose=True)
-        param_grid = {
-            'C': [0.1, 1, 10],          # Regularization parameter
-            # 'gamma': [1, 0.1],  # Kernel coefficient
-            'gamma': [1, 0.1, 0.01, 0.001],  # Kernel coefficient
-            'kernel': ['rbf']      # Try both RBF and Linear kernels
-            # 'kernel': ['rbf', 'linear']      # Try both RBF and Linear kernels
-        }
-
-        # Grid Search with 5-fold cross-validation
-        grid = GridSearchCV(svc, param_grid, refit=True, verbose=2, cv=5, n_jobs=-1, error_score='raise')
-        grid.fit(X_train, y_train) # Train
-
-        print(f"\nBest Parameters found: {grid.best_params_}")
-        y_pred = grid.predict(X_test) # Predict using the best model
-
-    else:
-        print("\nTraining SVM with fixed parameters...")
-        svc = svm.SVC(C=10, gamma=0.1, kernel='rbf', verbose=True)
-        # Train the SVM
-        svc.fit(X_train, y_train)
-
-        # Predict
-        y_pred = svc.predict(X_test)
-
-    # Evaluate
-    print("\nClassification Report:")
-    print(classification_report(y_test, y_pred))
 
 if __name__ == "__main__":
     run_classification_test()
