@@ -10,6 +10,8 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import classification_report, accuracy_score
 from joblib import dump
 from datetime import datetime
+import time
+import json
 
 class SVMClassification:
     def __init__(self, data_paths):
@@ -19,6 +21,7 @@ class SVMClassification:
         self.wavelet_analysis = WaveletAnalysis(wavelet_type='db4')
         self.feature_matrix = []
         self.labels = []
+        self.classification_report = {}
 
     def pad_or_truncate(self, feature, target_length):
         """Pad or truncate a feature vector to a fixed length."""
@@ -62,6 +65,7 @@ class SVMClassification:
     
     def train_classifier(self, C=1, gamma=0.1, find_best_parameters=False, save_model=True, parent_dir=None):
         # Split into train/test
+        self.classification_report = {}
         X_train, X_test, y_train, y_test = train_test_split(self.feature_matrix, self.labels, test_size=0.2, random_state=42)
         
         #check data distribution
@@ -119,25 +123,27 @@ class SVMClassification:
                 print(f"Model saved to {model_path}")
 
         # Evaluate
-        print("\nClassification Report:")
-        print(classification_report(y_test, y_pred))
+        self.classification_report = classification_report(y_test, y_pred, output_dict=True)
+        self.classification_report['C'] = C
+        self.classification_report['gamma'] = gamma
 
 def run_classification_test():
     # Sample data paths for testing
-    parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+    parent_dir = os.path.dirname(__file__)
+    data_dir = os.path.abspath(os.path.join(parent_dir, '..'))
     data_labels = {
-        os.path.join(parent_dir,'data/sand/trial1.csv'): 'sand',
-        os.path.join(parent_dir,'data/sand/trial2.csv'): 'sand',
-        os.path.join(parent_dir,'data/sand/trial3.csv'): 'sand',
-        # os.path.join(parent_dir,'data/sand/trial4.csv'): 'sand',
-        os.path.join(parent_dir,'data/concrete/trial1.csv'): 'concrete', 
-        # os.path.join(parent_dir,'data/concrete/trial2.csv'): 'concrete', 
-        # os.path.join(parent_dir,'data/concrete/trial3.csv'): 'concrete', 
-        # os.path.join(parent_dir,'data/concrete/trial4.csv'): 'concrete', 
-        # os.path.join(parent_dir,'data/gravel/trial1.csv'): 'gravel',
-        # os.path.join(parent_dir,'data/gravel/trial2.csv'): 'gravel', 
-        # os.path.join(parent_dir,'data/gravel/trial3.csv'): 'gravel', 
-        os.path.join(parent_dir,'data/gravel/trial4.csv'): 'gravel', 
+        os.path.join(data_dir,'data/sand/trial1.csv'): 'sand',
+        os.path.join(data_dir,'data/sand/trial2.csv'): 'sand',
+        # os.path.join(data_dir,'data/sand/trial3.csv'): 'sand',
+        # os.path.join(data_dir,'data/sand/trial4.csv'): 'sand',
+        os.path.join(data_dir,'data/concrete/trial1.csv'): 'concrete', 
+        # os.path.join(data_dir,'data/concrete/trial2.csv'): 'concrete', 
+        # os.path.join(data_dir,'data/concrete/trial3.csv'): 'concrete', 
+        # os.path.join(data_dir,'data/concrete/trial4.csv'): 'concrete', 
+        os.path.join(data_dir,'data/gravel/trial1.csv'): 'gravel',
+        # os.path.join(data_dir,'data/gravel/trial2.csv'): 'gravel', 
+        # os.path.join(data_dir,'data/gravel/trial3.csv'): 'gravel', 
+        # os.path.join(data_dir,'data/gravel/trial4.csv'): 'gravel', 
     }
 
     # Create an instance of the SVMClassification class
@@ -149,9 +155,18 @@ def run_classification_test():
                                 components=['x','y','z'])
     # svm_classifier.data_extractor.plot_steps('fl-x')  # Plot the steps for the 'fl-z' column
     # Train the classifier
+    st_time = time.time()
     svm_classifier.train_classifier(C=10, gamma=0.001, find_best_parameters=False, 
-                                    save_model=True, parent_dir=parent_dir)
-    
+                                    save_model=False, parent_dir=parent_dir)
+    end_time = time.time()
+    svm_classifier.classification_report['time'] = end_time - st_time
+    file_name = f"svm_report_{svm_classifier.classification_report['C']}_{svm_classifier.classification_report['gamma']}"\
+                f"_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
+    report_path = os.path.join(parent_dir, "reports", file_name)
+    with open(report_path, "w") as f:
+        json.dump(svm_classifier.classification_report, f, indent=4)
+
+    print(f"Classification report saved to {report_path}")
 
 if __name__ == "__main__":
     run_classification_test()
