@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 import os
+from sklearn import preprocessing as pre
 
 class DataExtractor:
     def __init__(self):
@@ -45,8 +46,8 @@ class DataExtractor:
         for col in self.data.columns:
             if self.data[col].dtype == 'float64':
                 self.data[col] = self.data[col].round(3)
-
-    def extract_steps(self, legs=None, components=None):
+   
+    def extract_steps(self, normalize_data=False, legs=None, components=None):
         """Extract the steps from the data.
         Args:
             legs (list): List of legs to extract steps from.
@@ -73,6 +74,12 @@ class DataExtractor:
                 
                 # Extract the data for the specified leg and component
                 self.steps[col_name] = self.extract_step_from_column(self.data[col_name].to_numpy(), self.data[contact_col_name])
+
+                if normalize_data:
+                    # Normalize the data to be between 0 and 1
+                    for i, step in enumerate(self.steps[col_name]):
+                        # Normalize each step segment
+                        self.steps[col_name][i] = pre.MinMaxScaler().fit_transform(step.reshape(-1, 1)).flatten()
                 
                 
     def extract_step_from_column(self, data_column, contact_column):
@@ -153,7 +160,7 @@ class DataExtractor:
 
         # Adjust layout
         plt.tight_layout()
-        plt.show()
+        # plt.show()
 
 def run_data_extractor():
     """Run the data extraction process."""
@@ -166,9 +173,12 @@ def run_data_extractor():
     data_extractor = DataExtractor()
     data_extractor.load_data(file_path)
     data_extractor.preprocess_data(exclude_colunms=['time'])
-    data_extractor.extract_steps(legs=['fl', 'rl'], components=['x', 'y', 'z'])
+    data_extractor.extract_steps(normalize_data=False, legs=['fl', 'rl'], components=['x', 'y', 'z'])
     # data_extractor.plot_original_signal('fl-z')
-    data_extractor.plot_steps('fl-z')
+    data_extractor.plot_steps('fl-x')
+    # data_extractor.extract_steps(normalize_data=True, legs=['fl', 'rl'], components=['x', 'y', 'z'])
+    # data_extractor.plot_steps('fl-x')
+    plt.show()
 
 if __name__ == "__main__":
 
