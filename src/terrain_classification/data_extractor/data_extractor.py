@@ -160,7 +160,7 @@ class DataExtractor:
 
         # Adjust layout
         plt.tight_layout()
-        # plt.show()
+        plt.show()
 
 def run_data_extractor():
     """Run the data extraction process."""
