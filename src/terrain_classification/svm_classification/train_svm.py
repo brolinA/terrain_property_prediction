@@ -138,7 +138,7 @@ class SVMClassification:
                         f"_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
             report_path = os.path.join(parent_dir, "reports", file_name)
             with open(report_path, "w") as f:
-                json.dump(svm_classifier.classification_report, f, indent=4)
+                json.dump(self.classification_report, f, indent=4)
 
             print(f"Classification report saved to {report_path}")
             
