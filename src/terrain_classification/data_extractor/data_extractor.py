@@ -20,6 +20,7 @@ class DataExtractor:
 
         # print data types of the columns
         # print(f"[DataExtractor] Columns in the data: \n{self.data.dtypes}")
+        self.preprocess_data(exclude_colunms=['time'])
    
     def preprocess_data(self, exclude_colunms=None, convert_to_numeric=True):
         """Preprocess the data by removing unnecessary columns and converting types.

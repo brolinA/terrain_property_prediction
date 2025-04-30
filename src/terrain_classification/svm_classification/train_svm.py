@@ -31,7 +31,7 @@ class SVMClassification:
             return np.pad(feature, (0, target_length - len(feature)), mode='constant')  # Pad with zeros
         return feature
     
-    def prepare_data(self, normalize_data=False, legs:list=None, components:list=None):
+    def create_feature_matrix_and_label(self, normalize_data=False, legs:list=None, components:list=None):
         """Load and preprocess the data."""
         target_length = 80  # Define a fixed length for all features
 
@@ -44,7 +44,6 @@ class SVMClassification:
         for file_path, label in self.data_paths.items():
             print(f"Loading data from {file_path} with label {label}")
             self.data_extractor.load_data(file_path)  # Load the data
-            self.data_extractor.preprocess_data()  # Preprocess the data
     
             # Extract steps from the data
             self.data_extractor.extract_steps(normalize_data=normalize_data,
@@ -167,7 +166,7 @@ def run_classification_test():
     svm_classifier = SVMClassification(data_labels)
 
     # Load the data
-    svm_classifier.prepare_data(normalize_data=True,
+    svm_classifier.create_feature_matrix_and_label(normalize_data=True,
                                 legs=['fl', 'fr', 'rl', 'rr'], 
                                 components=['x','y','z'])
 

@@ -87,7 +87,6 @@ def run_WaveletAnalysis():
     
     data_extractor = DataExtractor()
     data_extractor.load_data(file_path)
-    data_extractor.preprocess_data(exclude_colunms=['time'])
     data_extractor.extract_steps(legs=['fl', 'rl'], components=['x', 'y', 'z'])
     # data_extractor.plot_steps('fl-z')
 
