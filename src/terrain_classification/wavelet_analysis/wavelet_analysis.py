@@ -15,7 +15,7 @@ class WaveletAnalysis:
     def perform_analysis(self, input_signals, level=None):
         """Perform wavelet analysis on the input signals."""
         self.input_signal = input_signals
-
+        self.wavelet_results = []  # Reset results for each analysis
         for signal in input_signals:
             extracted_details = self.extract_details(signal, level=level)
             self.wavelet_results.append(extracted_details)

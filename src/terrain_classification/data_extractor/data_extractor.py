@@ -12,6 +12,7 @@ class DataExtractor:
 
     def load_data(self, file_path):
         """Load data from the CSV file and preprocess it."""
+        self.steps = {}
         self.data = pd.read_csv(file_path)
 
         # Strip leading/trailing spaces from column names
@@ -47,7 +48,7 @@ class DataExtractor:
             if self.data[col].dtype == 'float64':
                 self.data[col] = self.data[col].round(3)
    
-    def extract_steps(self, normalize_data=False, legs=None, components=None):
+    def extract_steps(self, normalize_data=False, legs=None, components=None, pad_length=100):
         """Extract the steps from the data.
         Args:
             legs (list): List of legs to extract steps from.
@@ -73,7 +74,7 @@ class DataExtractor:
                     continue
                 
                 # Extract the data for the specified leg and component
-                self.steps[col_name] = self.extract_step_from_column(self.data[col_name].to_numpy(), self.data[contact_col_name])
+                self.steps[col_name] = self.extract_step_from_column(self.data[col_name].to_numpy(), self.data[contact_col_name], pad_length)
 
                 if normalize_data:
                     # Normalize the data to be between 0 and 1
@@ -81,8 +82,15 @@ class DataExtractor:
                         # Normalize each step segment
                         self.steps[col_name][i] = pre.MinMaxScaler().fit_transform(step.reshape(-1, 1)).flatten()
                 
-                
-    def extract_step_from_column(self, data_column, contact_column):
+    def pad_or_truncate(self, feature, target_length):
+        """Pad or truncate a feature vector to a fixed length."""
+        if len(feature) > target_length:
+            return feature[:target_length]  # Truncate
+        elif len(feature) < target_length:
+            return np.pad(feature, (0, target_length - len(feature)), mode='constant')  # Pad with zeros
+        return feature
+
+    def extract_step_from_column(self, data_column, contact_column, pad_length):
         """Extract steps from given data column
         Args:
             data_column (numpy array): The data column to extract steps from.
@@ -98,7 +106,6 @@ class DataExtractor:
         non_zero_pts = np.where(contact_data != 0)[0]
         # Split the array into segments of consecutive non-zero values
         step_segment_index = np.split(non_zero_pts, np.where(np.diff(non_zero_pts) != 1)[0] + 1)
-        # print(f"[DataExtractor] Step segment index: {step_segment_index}")
 
         # Extract the non-zero values for each segment
         step_segments = []
@@ -112,6 +119,9 @@ class DataExtractor:
                 segment = np.append(segment, end_idx)
             
             if len(segment) > 15: #to ensure that we have enought data in the step
+                if(not len(segment) == pad_length):
+                    segment = self.pad_or_truncate(segment, pad_length)
+
                 step_segments.append(contact_data[segment])
 
         step_segments = step_segments[1:len(step_segments)-1]  # Remove the first and last segments
