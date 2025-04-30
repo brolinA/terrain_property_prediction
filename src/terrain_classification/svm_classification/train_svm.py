@@ -54,8 +54,8 @@ class SVMClassification:
             for step in self.data_extractor.steps.values():
                 wavelet_result = self.wavelet_analysis.perform_analysis(step, level=2)
                 for feature in wavelet_result:
-                    padded_feature = self.pad_or_truncate(feature.flatten(), target_length)
-                    self.feature_matrix.append(padded_feature)
+                    # padded_feature = self.pad_or_truncate(feature.flatten(), target_length)
+                    self.feature_matrix.append(feature.flatten())
                     self.labels.append(label)
     
         self.feature_matrix = np.array(self.feature_matrix)
@@ -63,22 +63,22 @@ class SVMClassification:
         # print(f"Feature matrix shape: {self.feature_matrix.shape}")
         # print(f"Labels shape: {self.labels.shape}")
     
-    def train_classifier(self, C=1, gamma=0.1, find_best_parameters=False, save_model=True, parent_dir=None):
+    def train_classifier(self, C=1, gamma=0.1, find_best_parameters=False, save_model=False, save_report=False, parent_dir=None, verbose=False):
         # Split into train/test
         self.classification_report = {}
         X_train, X_test, y_train, y_test = train_test_split(self.feature_matrix, self.labels, test_size=0.2, random_state=42)
         
-        #check data distribution
-        unique_labels, label_counts = np.unique(y_train, return_counts=True)
-        for label, count in zip(unique_labels, label_counts):
-            print(f"Label {label}: {count} samples")
-        # return
+        if verbose:
+            #check data distribution
+            unique_labels, label_counts = np.unique(y_train, return_counts=True)
+            for label, count in zip(unique_labels, label_counts):
+                print(f"[Training] Label {label}: {count} samples")
+            print(f"[Training] ratio {max(label_counts)/min(label_counts)}")
+
         # Feature scaling (VERY important for SVM)
         scaler = StandardScaler()
         X_train = scaler.fit_transform(X_train)
         X_test = scaler.transform(X_test)
-        print(f"X_train shape: {X_train.shape}")
-        print(f"X_test shape: {X_test.shape}")
 
         # Set up the SVM and parameter grid
         current_time = datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -88,16 +88,18 @@ class SVMClassification:
             svc = svm.SVC(verbose=False)
             param_grid = {
                 'C': [0.1, 1, 10, 100],          # Regularization parameter
-                # 'gamma': [1, 0.1],  # Kernel coefficient
                 'gamma': [1, 0.1, 0.01, 0.001],  # Kernel coefficient
                 'kernel': ['rbf']      # Try both RBF and Linear kernels
-                # 'kernel': ['rbf', 'linear']      # Try both RBF and Linear kernels
             }
 
             # Grid Search with 5-fold cross-validation
             grid = GridSearchCV(svc, param_grid, refit=True, verbose=2, cv=5, n_jobs=-1, error_score='raise')
             grid.fit(X_train, y_train) # Train
-            print(f"\nBest Parameters found: {grid.best_params_}")
+
+            print(f"\n[Training] Best Parameters found: {grid.best_params_}")
+            
+            self.classification_report['C'] = grid.best_params_['C']
+            self.classification_report['gamma'] = grid.best_params_['gamma']
             y_pred = grid.predict(X_test) # Predict using the best model
 
             # Save the best model
@@ -105,46 +107,61 @@ class SVMClassification:
                 best_model = grid.best_estimator_
                 model_path = os.path.join(parent_dir, f"models/svm_model_c{grid.best_params_['C']}_gamma{grid.best_params_['gamma']}_{current_time}.joblib")
                 dump(best_model, model_path)
-                print(f"Best model saved to {model_path}")
+                print(f"[Training] Best model saved to {model_path}")
+
+                print("\n[Training] Saving GridSearchCV results...")
+                # Optionally, save results to a CSV file
+                import pandas as pd
+                grid_results_csv = os.path.join(parent_dir, f"reports/gridsearch_results_{current_time}.csv")
+                pd.DataFrame(grid.cv_results_).to_csv(grid_results_csv, index=False)
+                print(f"[Training] GridSearchCV results saved to {grid_results_csv}")
 
         else:
-            # c = 10; gamma = 0.001
-            print("\nTraining SVM with fixed parameters...")
+            print("\n[Training] Training SVM with fixed parameters...")
             svc = svm.SVC(C=C, gamma=gamma, kernel='rbf')
-            # Train the SVM
-            svc.fit(X_train, y_train)
-            # Predict
-            y_pred = svc.predict(X_test)
+            
+            svc.fit(X_train, y_train) # Train the SVM
+            y_pred = svc.predict(X_test) # Predict
             
             if save_model:
                 # Save the model
-                model_path = os.path.join(parent_dir, f"models/svm_model_c{C}_gamma{gamma}_{current_time}.joblib")
+                model_path = os.path.join(parent_dir, f"models/svm_model_c{C}_{current_time}.joblib")
                 dump(svc, model_path)
                 print(f"Model saved to {model_path}")
 
-        # Evaluate
-        self.classification_report = classification_report(y_test, y_pred, output_dict=True)
-        self.classification_report['C'] = C
-        self.classification_report['gamma'] = gamma
+            self.classification_report['C'] = C
+            self.classification_report['gamma'] = gamma
+
+        self.classification_report['report'] = classification_report(y_test, y_pred, output_dict=True)
+        #saving report
+        if save_report: #save report
+            file_name = f"svm_report_{self.classification_report['C']}_{self.classification_report['gamma']}"\
+                        f"_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
+            report_path = os.path.join(parent_dir, "reports", file_name)
+            with open(report_path, "w") as f:
+                json.dump(svm_classifier.classification_report, f, indent=4)
+
+            print(f"Classification report saved to {report_path}")
+            
+
 
 def run_classification_test():
     # Sample data paths for testing
     parent_dir = os.path.dirname(__file__)
     data_dir = os.path.abspath(os.path.join(parent_dir, '..'))
-    data_labels = {
-        os.path.join(data_dir,'data/sand/trial1.csv'): 'sand',
-        os.path.join(data_dir,'data/sand/trial2.csv'): 'sand',
-        # os.path.join(data_dir,'data/sand/trial3.csv'): 'sand',
-        # os.path.join(data_dir,'data/sand/trial4.csv'): 'sand',
-        os.path.join(data_dir,'data/concrete/trial1.csv'): 'concrete', 
-        # os.path.join(data_dir,'data/concrete/trial2.csv'): 'concrete', 
-        # os.path.join(data_dir,'data/concrete/trial3.csv'): 'concrete', 
-        # os.path.join(data_dir,'data/concrete/trial4.csv'): 'concrete', 
-        os.path.join(data_dir,'data/gravel/trial1.csv'): 'gravel',
-        # os.path.join(data_dir,'data/gravel/trial2.csv'): 'gravel', 
-        # os.path.join(data_dir,'data/gravel/trial3.csv'): 'gravel', 
-        # os.path.join(data_dir,'data/gravel/trial4.csv'): 'gravel', 
+    save_report = False
+    versbose = False
+    
+    files_to_use = {
+        "sand": ["trial1.csv", "trial2.csv", "trial3.csv", "trial4.csv", "trial5.csv", "trial6.csv", "trial7.csv", "trial8.csv"],
+        "concrete": ["trial1.csv", "trial2.csv", "trial3.csv", "trial4.csv", "trial5.csv", "trial6.csv", "trial7.csv", "trial8.csv"],
+        "gravel": ["trial1.csv", "trial2.csv", "trial3.csv", "trial4.csv", "trial5.csv", "trial6.csv", "trial7.csv", "trial8.csv"],
     }
+    #create a dictionary to hold the data file and its label
+    data_labels = {}
+    for key_ in files_to_use.keys():
+        for file_ in files_to_use[key_]:
+            data_labels[os.path.join(data_dir, 'data', key_, file_)] = key_
 
     # Create an instance of the SVMClassification class
     svm_classifier = SVMClassification(data_labels)
@@ -153,20 +170,22 @@ def run_classification_test():
     svm_classifier.prepare_data(normalize_data=True,
                                 legs=['fl', 'fr', 'rl', 'rr'], 
                                 components=['x','y','z'])
-    # svm_classifier.data_extractor.plot_steps('fl-x')  # Plot the steps for the 'fl-z' column
+
+    if versbose:
+        unique_labels, label_counts = np.unique(svm_classifier.labels, return_counts=True)
+        for label, count in zip(unique_labels, label_counts):
+            print(f"[Test fun] Label {label}: {count} samples")
+        print(f"[Test fun] ratio {max(label_counts)/min(label_counts)}")
+    
     # Train the classifier
     st_time = time.time()
-    svm_classifier.train_classifier(C=10, gamma=0.001, find_best_parameters=False, 
-                                    save_model=False, parent_dir=parent_dir)
+    svm_classifier.train_classifier(C=10, gamma=0.01, find_best_parameters=False, 
+                                    save_model=False, save_report=False, parent_dir=parent_dir, verbose=True)
     end_time = time.time()
-    svm_classifier.classification_report['time'] = end_time - st_time
-    file_name = f"svm_report_{svm_classifier.classification_report['C']}_{svm_classifier.classification_report['gamma']}"\
-                f"_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
-    report_path = os.path.join(parent_dir, "reports", file_name)
-    with open(report_path, "w") as f:
-        json.dump(svm_classifier.classification_report, f, indent=4)
+    print(f"[Test fun] Training time: {end_time - st_time} seconds")
 
-    print(f"Classification report saved to {report_path}")
+    if versbose:
+        print(f"[Test fun] Classification report: {svm_classifier.classification_report['report']}")
 
 if __name__ == "__main__":
     run_classification_test()
