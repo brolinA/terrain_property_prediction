@@ -23,6 +23,7 @@ class SVMClassification:
         self.labels = []
         self.classification_report = {}
         self.report = None
+        self.latest_model = None
     
     def create_feature_matrix_and_label(self, normalize_data=False, legs:list=None, components:list=None, combine_components=False):
         """Load and preprocess the data."""
@@ -56,7 +57,7 @@ class SVMClassification:
         # print(f"Labels shape: {self.labels.shape}")
     
     def train_classifier(self, C=1, gamma=0.1, find_best_parameters=False, save_model=False, model_file_name=None,
-                         save_report=False, parent_dir=None, verbose=False):
+                         save_report=False, file_path=None, verbose=False):
         # Split into train/test
         self.classification_report = {}
         X_train, X_test, y_train, y_test = train_test_split(self.feature_matrix, self.labels, test_size=0.2, random_state=42)
@@ -88,6 +89,7 @@ class SVMClassification:
             # Grid Search with 5-fold cross-validation
             grid = GridSearchCV(svc, param_grid, refit=True, verbose=2, cv=5, n_jobs=-1, error_score='raise')
             grid.fit(X_train, y_train) # Train
+            self.latest_model = grid.best_estimator_ # Save the best model
 
             print(f"\n[Training] Best Parameters found: {grid.best_params_}")
             
@@ -95,55 +97,80 @@ class SVMClassification:
             self.classification_report['gamma'] = grid.best_params_['gamma']
             y_pred = grid.predict(X_test) # Predict using the best model
 
-            # Save the best model
-            if save_model:
-                best_model = grid.best_estimator_
-                if model_file_name is None:
-                    model_file_name = f"svm_model_c{grid.best_params_['C']}_gamma{grid.best_params_['gamma']}_{current_time}"
-
-                model_path = os.path.join(parent_dir, "models", f"{model_file_name}.joblib")
-                dump(best_model, model_path)
-                print(f"[Training] Best model saved to {model_path}")
-
-            if save_report:
-                print("\n[Training] Saving GridSearchCV results...")
-                # Optionally, save results to a CSV file
-                import pandas as pd
-                grid_results_csv = os.path.join(parent_dir, "reports", f"gridsearch_results_{current_time}.csv")
-                pd.DataFrame(grid.cv_results_).to_csv(grid_results_csv, index=False)
-                print(f"[Training] GridSearchCV results saved to {grid_results_csv}")
-
         else:
             print("\n[Training] Training SVM with fixed parameters...")
             svc = svm.SVC(C=C, gamma=gamma, kernel='rbf', class_weight='balanced')
             
             svc.fit(X_train, y_train) # Train the SVM
+            self.latest_model = svc # Save the model
+
             y_pred = svc.predict(X_test) # Predict
-            
-            if save_model:
-                # Save the model
-                if model_file_name is None:
-                    model_file_name = f"models/svm_model_c{C}_{current_time}"
-                model_path = os.path.join(parent_dir, "models", f"{model_file_name}.joblib")
-                dump(svc, model_path)
-                print(f"Model saved to {model_path}")
 
             self.classification_report['C'] = C
             self.classification_report['gamma'] = gamma
 
         self.classification_report['report'] = classification_report(y_test, y_pred, output_dict=True)
         self.report = classification_report(y_test, y_pred, output_dict=False)
+        
         #saving report
         if save_report: #save report
-            file_name = f"svm_report_{self.classification_report['C']}_{self.classification_report['gamma']}"\
+            self.save_report(name=model_file_name, file_path=file_path)
+        
+        if save_model:
+            self.save_model(name=model_file_name, file_path=file_path)
+
+    def print_classification_report(self):
+        """Print the classification report."""
+        if self.report is not None:
+            print(self.report)
+        else:
+            print("No classification report available. Please run the classifier first.")
+    
+    def save_report(self, name=None, file_path=None):
+        """Save the classification report to a file."""
+        if self.classification_report is None:
+            print("No classification report available to save. Run the classifier first.")
+            return
+        
+        if name is None:
+            name = f"svm_report_{self.classification_report['C']}_{self.classification_report['gamma']}"\
                         f"_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json"
-            report_path = os.path.join(parent_dir, "reports", file_name)
-            with open(report_path, "w") as f:
-                json.dump(self.classification_report, f, indent=4)
-
-            print(f"Classification report saved to {report_path}")
             
+        if file_path is None:
+            file_path = os.path.abspath(os.path.join(os.path.dirname(__file__)))
+            file_path = os.path.join(file_path, "reports", f"{name}.json")
+        else:
+            file_path = os.path.join(file_path, f"{name}.json")
+        # check if path exists
+        if not os.path.exists(os.path.dirname(file_path)):
+            os.makedirs(os.path.dirname(file_path))
+        # save report
+        with open(file_path, "w") as f:
+            json.dump(self.classification_report, f, indent=4)
 
+        print(f"Classification report saved to {file_path}")
+    
+    def save_model(self, name=None, file_path=None):
+        """Save the model to a file."""
+        if self.latest_model is None:
+            print("No model available to save. Run the classifier first.")
+            return
+        
+        if name is None:
+            name = f"svm_model_{self.classification_report['C']}_{self.classification_report['gamma']}"
+
+        if file_path is None:
+            file_path = os.path.abspath(os.path.join(os.path.dirname(__file__)))
+            file_path = os.path.join(file_path, "models", f"{name}.joblib")
+        else:
+            file_path = os.path.join(file_path, f"{name}.joblib")
+
+        # check if path exists
+        if not os.path.exists(os.path.dirname(file_path)):
+            os.makedirs(os.path.dirname(file_path))
+        # save model
+        dump(self.latest_model, file_path)
+        print(f"Model saved to {file_path}")
 
 def run_classification_test():
     # Sample data paths for testing
@@ -180,7 +207,7 @@ def run_classification_test():
     # Train the classifier
     st_time = time.time()
     svm_classifier.train_classifier(C=10, gamma=0.01, find_best_parameters=False, 
-                                    save_model=False, save_report=False, parent_dir=parent_dir, verbose=True)
+                                    save_model=False, save_report=save_report, parent_dir=parent_dir, verbose=True)
     end_time = time.time()
     print(f"[Test fun] Training time: {end_time - st_time} seconds")
 
