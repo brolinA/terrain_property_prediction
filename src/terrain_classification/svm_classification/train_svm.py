@@ -22,16 +22,9 @@ class SVMClassification:
         self.feature_matrix = []
         self.labels = []
         self.classification_report = {}
-
-    def pad_or_truncate(self, feature, target_length):
-        """Pad or truncate a feature vector to a fixed length."""
-        if len(feature) > target_length:
-            return feature[:target_length]  # Truncate
-        elif len(feature) < target_length:
-            return np.pad(feature, (0, target_length - len(feature)), mode='constant')  # Pad with zeros
-        return feature
+        self.report = None
     
-    def create_feature_matrix_and_label(self, normalize_data=False, legs:list=None, components:list=None):
+    def create_feature_matrix_and_label(self, normalize_data=False, legs:list=None, components:list=None, combine_components=False):
         """Load and preprocess the data."""
         target_length = 80  # Define a fixed length for all features
 
@@ -48,12 +41,12 @@ class SVMClassification:
             # Extract steps from the data
             self.data_extractor.extract_steps(normalize_data=normalize_data,
                                             legs=legs, 
-                                            components=components)
+                                            components=components,
+                                            combine_components=combine_components)
     
             for step in self.data_extractor.steps.values():
-                wavelet_result = self.wavelet_analysis.perform_analysis(step, level=2)
+                wavelet_result = self.wavelet_analysis.perform_analysis(step, level=None)
                 for feature in wavelet_result:
-                    # padded_feature = self.pad_or_truncate(feature.flatten(), target_length)
                     self.feature_matrix.append(feature.flatten())
                     self.labels.append(label)
     
@@ -62,7 +55,8 @@ class SVMClassification:
         # print(f"Feature matrix shape: {self.feature_matrix.shape}")
         # print(f"Labels shape: {self.labels.shape}")
     
-    def train_classifier(self, C=1, gamma=0.1, find_best_parameters=False, save_model=False, save_report=False, parent_dir=None, verbose=False):
+    def train_classifier(self, C=1, gamma=0.1, find_best_parameters=False, save_model=False, model_file_name=None,
+                         save_report=False, parent_dir=None, verbose=False):
         # Split into train/test
         self.classification_report = {}
         X_train, X_test, y_train, y_test = train_test_split(self.feature_matrix, self.labels, test_size=0.2, random_state=42)
@@ -104,27 +98,33 @@ class SVMClassification:
             # Save the best model
             if save_model:
                 best_model = grid.best_estimator_
-                model_path = os.path.join(parent_dir, f"models/svm_model_c{grid.best_params_['C']}_gamma{grid.best_params_['gamma']}_{current_time}.joblib")
+                if model_file_name is None:
+                    model_file_name = f"svm_model_c{grid.best_params_['C']}_gamma{grid.best_params_['gamma']}_{current_time}"
+
+                model_path = os.path.join(parent_dir, "models", f"{model_file_name}.joblib")
                 dump(best_model, model_path)
                 print(f"[Training] Best model saved to {model_path}")
 
+            if save_report:
                 print("\n[Training] Saving GridSearchCV results...")
                 # Optionally, save results to a CSV file
                 import pandas as pd
-                grid_results_csv = os.path.join(parent_dir, f"reports/gridsearch_results_{current_time}.csv")
+                grid_results_csv = os.path.join(parent_dir, "reports", f"gridsearch_results_{current_time}.csv")
                 pd.DataFrame(grid.cv_results_).to_csv(grid_results_csv, index=False)
                 print(f"[Training] GridSearchCV results saved to {grid_results_csv}")
 
         else:
             print("\n[Training] Training SVM with fixed parameters...")
-            svc = svm.SVC(C=C, gamma=gamma, kernel='rbf')
+            svc = svm.SVC(C=C, gamma=gamma, kernel='rbf', class_weight='balanced')
             
             svc.fit(X_train, y_train) # Train the SVM
             y_pred = svc.predict(X_test) # Predict
             
             if save_model:
                 # Save the model
-                model_path = os.path.join(parent_dir, f"models/svm_model_c{C}_{current_time}.joblib")
+                if model_file_name is None:
+                    model_file_name = f"models/svm_model_c{C}_{current_time}"
+                model_path = os.path.join(parent_dir, "models", f"{model_file_name}.joblib")
                 dump(svc, model_path)
                 print(f"Model saved to {model_path}")
 
@@ -132,6 +132,7 @@ class SVMClassification:
             self.classification_report['gamma'] = gamma
 
         self.classification_report['report'] = classification_report(y_test, y_pred, output_dict=True)
+        self.report = classification_report(y_test, y_pred, output_dict=False)
         #saving report
         if save_report: #save report
             file_name = f"svm_report_{self.classification_report['C']}_{self.classification_report['gamma']}"\

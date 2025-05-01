@@ -49,7 +49,7 @@ class DataExtractor:
             if self.data[col].dtype == 'float64':
                 self.data[col] = self.data[col].round(3)
    
-    def extract_steps(self, normalize_data=False, legs=None, components=None, pad_length=100):
+    def extract_steps(self, normalize_data=False, legs=None, components=None, pad_length=100, combine_components=False):
         """Extract the steps from the data.
         Args:
             legs (list): List of legs to extract steps from.
@@ -66,6 +66,7 @@ class DataExtractor:
             return
 
         for leg in legs:
+            all_components = []
             for component in components:
                 col_name = f"{leg}-{component}"
                 contact_col_name = f"{leg}-contact"
@@ -75,14 +76,28 @@ class DataExtractor:
                     continue
                 
                 # Extract the data for the specified leg and component
-                self.steps[col_name] = self.extract_step_from_column(self.data[col_name].to_numpy(), self.data[contact_col_name], pad_length)
-
+                all_components.append(self.extract_step_from_column(self.data[col_name].to_numpy(), self.data[contact_col_name], pad_length))
                 if normalize_data:
                     # Normalize the data to be between 0 and 1
-                    for i, step in enumerate(self.steps[col_name]):
-                        # Normalize each step segment
-                        self.steps[col_name][i] = pre.MinMaxScaler().fit_transform(step.reshape(-1, 1)).flatten()
+                    #Normalize onle the last component if you are combining components
+                    for j in range(len(all_components[-1])):
+                        all_components[-1][j] = pre.MinMaxScaler().fit_transform(np.array(all_components[-1][j]).reshape(-1, 1)).flatten()
                 
+                if not combine_components:
+                    # if we are not combining components, then we need to store the steps for each component
+                    self.steps[col_name] = all_components[0]
+                    all_components = [] #rest the all_components list
+                    
+            if combine_components:
+                #combine all components colomn wise
+                min_len = min([len(x) for x in all_components])
+                # Truncate all segments to the minimum length to do column-wise stacking
+                for i in range(len(all_components)):                    
+                    all_components[i] = all_components[i][:min_len]
+                
+                all_components = np.column_stack(all_components)
+                self.steps[leg] = all_components
+                   
     def pad_or_truncate(self, feature, target_length):
         """Pad or truncate a feature vector to a fixed length."""
         if len(feature) > target_length:
@@ -123,7 +138,7 @@ class DataExtractor:
                 if(not len(segment) == pad_length):
                     segment = self.pad_or_truncate(segment, pad_length)
 
-                step_segments.append(contact_data[segment])
+                step_segments.append(np.array(contact_data[segment]))
 
         step_segments = step_segments[1:len(step_segments)-1]  # Remove the first and last segments
         return step_segments
