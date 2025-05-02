@@ -2,6 +2,7 @@
 import os
 from terrain_classification.data_extractor.data_extractor import DataExtractor
 from terrain_classification.wavelet_analysis.wavelet_analysis import WaveletAnalysis
+from terrain_classification.data_augmentation.data_augmentation import DataAugmentation
 #import svm realted modules
 import numpy as np
 from sklearn import svm
@@ -24,8 +25,10 @@ class SVMClassification:
         self.classification_report = {}
         self.report = None
         self.latest_model = None
+        self.data_augmentation = DataAugmentation()
     
-    def create_feature_matrix_and_label(self, normalize_data=False, legs:list=None, components:list=None, combine_components=False):
+    def create_feature_matrix_and_label(self, normalize_data=False, legs:list=None, components:list=None, 
+                                        combine_components=False, augment_data=False):
         """Load and preprocess the data."""
         target_length = 80  # Define a fixed length for all features
 
@@ -46,6 +49,9 @@ class SVMClassification:
                                             combine_components=combine_components)
     
             for step in self.data_extractor.steps.values():
+                if augment_data:
+                    step = self.augment_data(step, augmentation_type='noise', noise_level=0.01)
+                
                 wavelet_result = self.wavelet_analysis.perform_analysis(step, level=None)
                 for feature in wavelet_result:
                     self.feature_matrix.append(feature.flatten())
@@ -55,6 +61,22 @@ class SVMClassification:
         self.labels = np.array(self.labels)
         # print(f"Feature matrix shape: {self.feature_matrix.shape}")
         # print(f"Labels shape: {self.labels.shape}")
+    
+    def augment_data(self, signals, augmentation_type='noise', noise_level=0.01):
+        """Augment the data using the specified augmentation type."""
+        augmented_signals = []
+        for signal in signals:
+            if augmentation_type == 'noise':
+                augmented_signal = self.data_augmentation.add_noise(signal, noise_level)
+            elif augmentation_type == 'time_scale':
+                augmented_signal = self.data_augmentation.time_scale(signal, scale_factor=1.2)
+            else:
+                raise ValueError(f"Unknown augmentation type: {augmentation_type}")
+            augmented_signals.append(augmented_signal)
+        
+        #append augmented signal to original signal
+        return_signal = np.append(signals, augmented_signals, axis=0)
+        return return_signal
     
     def train_classifier(self, C=1, gamma=0.1, find_best_parameters=False, save_model=False, model_file_name=None,
                          save_report=False, file_path=None, verbose=False):
@@ -75,8 +97,6 @@ class SVMClassification:
         X_test = scaler.transform(X_test)
 
         # Set up the SVM and parameter grid
-        current_time = datetime.now().strftime("%Y%m%d_%H%M%S")
-
         if find_best_parameters:
             print("\nFinding best parameters...")
             svc = svm.SVC(verbose=False)
