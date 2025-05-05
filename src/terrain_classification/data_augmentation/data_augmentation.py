@@ -58,6 +58,31 @@ class DataAugmentation:
     def interpolate_signals(self, signal1, signal2, alpha=0.5):
         """Interpolate between two signals."""
         return alpha * signal1 + (1 - alpha) * signal2
+    
+    def augment_signal(self, signal, type, param):
+        """Augment the signal based on the specified type and parameters."""
+        if type == 'time_shift':
+            return self.time_shift(signal, param)
+        elif type == 'time_scale':
+            return self.time_scale(signal, param)
+        elif type == 'random_crop':
+            return self.random_crop(signal, param)
+        elif type == 'pad_or_truncate':
+            return self.pad_or_truncate(signal, param)
+        elif type == 'add_noise':
+            return self.add_noise(signal, param)
+        elif type == 'amplitude_scale':
+            return self.amplitude_scale(signal, param)
+        elif type == 'signal_inversion':
+            return self.signal_inversion(signal)
+        elif type == 'time_warp':
+            return self.time_warp(signal, param)
+        elif type == 'low_pass_filter':
+            return self.low_pass_filter(signal, param)
+        else:
+            raise ValueError("Unknown augmentation type. Given {type} but expected one of ['time_shift', 'time_scale',\
+                              'random_crop', 'pad_or_truncate', 'add_noise', 'amplitude_scale', 'signal_inversion',\
+                              'time_warp', 'low_pass_filter']")
 
 def test_data_augmentation():
     # Create a sample signal
@@ -75,7 +100,7 @@ def test_data_augmentation():
     noisy_signal = augmenter.add_noise(signal, noise_level=0.1)
     scaled_amplitude_signal = augmenter.amplitude_scale(signal, scale_factor=1.5)
     inverted_signal = augmenter.signal_inversion(signal)
-    warped_signal = augmenter.time_warp(signal, warp_factor=0.2)
+    warped_signal = augmenter.time_warp(signal, warp_factor=0.8)
     filtered_signal = augmenter.low_pass_filter(signal, cutoff=10)
 
     # Plot the original and augmented signals
@@ -113,13 +138,13 @@ def test_data_augmentation():
     plt.plot(inverted_signal)
     plt.title("Inverted Signal")
 
-    # plt.subplot(3, 3, 9)
-    # plt.plot(warped_signal)
-    # plt.title("Time Warped Signal")
-
     plt.subplot(3, 3, 9)
-    plt.plot(filtered_signal)
-    plt.title("Filtered Signal")
+    plt.plot(warped_signal)
+    plt.title("Time Warped Signal")
+
+    # plt.subplot(3, 3, 9)
+    # plt.plot(filtered_signal)
+    # plt.title("Filtered Signal")
 
     plt.tight_layout()
     plt.show()
