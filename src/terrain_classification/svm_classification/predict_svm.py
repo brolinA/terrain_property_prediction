@@ -5,8 +5,13 @@ import joblib
 
 class SVMPredictor:
     def __init__(self, model_path):
-        self.model = joblib.load(model_path)
         self.model_path = model_path
+        self.model = None
+        if os.path.exists(self.model_path):
+            self.model = joblib.load(model_path)
+        else:
+            raise FileNotFoundError(f"Model file not found at {model_path}")
+
         print(f"Model loaded from {model_path}")
 
     def predict(self, data):

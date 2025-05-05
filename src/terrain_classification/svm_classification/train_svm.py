@@ -13,6 +13,7 @@ from joblib import dump
 from datetime import datetime
 import time
 import json
+from sklearn.metrics import ConfusionMatrixDisplay
 
 class SVMClassification:
     def __init__(self, data_paths):
@@ -25,13 +26,14 @@ class SVMClassification:
         self.classification_report = {}
         self.report = None
         self.latest_model = None
+        self.scaler = None
         self.data_augmentation = DataAugmentation()
+        self.original_data = []
     
     def create_feature_matrix_and_label(self, normalize_data=False, legs:list=None, components:list=None, 
-                                        combine_components=False, augment_data=False):
+                                        combine_components=False, data_padding_size= 70, augment_data=False,
+                                        augmetation_types=['noise'], augment_params=[0.1]):
         """Load and preprocess the data."""
-        target_length = 80  # Define a fixed length for all features
-
         if legs is None or components is None:
             # Set default values for legs and components
             legs = ['fl']
@@ -39,19 +41,22 @@ class SVMClassification:
             print(f"Using default legs: {legs} and components: {components}")
 
         for file_path, label in self.data_paths.items():
-            print(f"Loading data from {file_path} with label {label}")
+            # print(f"Loading data from {file_path} with label {label}")
             self.data_extractor.load_data(file_path)  # Load the data
     
             # Extract steps from the data
             self.data_extractor.extract_steps(normalize_data=normalize_data,
                                             legs=legs, 
                                             components=components,
-                                            combine_components=combine_components)
+                                            combine_components=combine_components,
+                                            pad_length=data_padding_size)
     
             for step in self.data_extractor.steps.values():
+                #apply all data augmentation methods
                 if augment_data:
-                    step = self.augment_data(step, augmentation_type='noise', noise_level=0.01)
-                
+                    step = self.augment_data(step, augmetation_types, augment_params)
+
+                self.save_original_data(step) #saving it for later visualization
                 wavelet_result = self.wavelet_analysis.perform_analysis(step, level=None)
                 for feature in wavelet_result:
                     self.feature_matrix.append(feature.flatten())
@@ -62,28 +67,30 @@ class SVMClassification:
         # print(f"Feature matrix shape: {self.feature_matrix.shape}")
         # print(f"Labels shape: {self.labels.shape}")
     
-    def augment_data(self, signals, augmentation_type='noise', noise_level=0.01):
+    def save_original_data(self, steps):
+        """Save the original data for later use."""
+        for step in steps:
+            self.original_data.append(step)
+
+    def augment_data(self, signals, augmentation_types, augment_params):
         """Augment the data using the specified augmentation type."""
         augmented_signals = []
-        for signal in signals:
-            if augmentation_type == 'noise':
-                augmented_signal = self.data_augmentation.add_noise(signal, noise_level)
-            elif augmentation_type == 'time_scale':
-                augmented_signal = self.data_augmentation.time_scale(signal, scale_factor=1.2)
-            else:
-                raise ValueError(f"Unknown augmentation type: {augmentation_type}")
-            augmented_signals.append(augmented_signal)
+
+        for augmentation_type, param in zip(augmentation_types, augment_params):
+            for signal in signals:
+                augmented_signal = self.data_augmentation.augment_signal(signal, augmentation_type, param)
+                augmented_signals.append(augmented_signal)
         
         #append augmented signal to original signal
         return_signal = np.append(signals, augmented_signals, axis=0)
         return return_signal
     
-    def train_classifier(self, C=1, gamma=0.1, find_best_parameters=False, save_model=False, model_file_name=None,
+    def train_classifier(self, C=[1], gamma=[0.1], find_best_parameters=False, save_model=False, model_file_name=None,
                          save_report=False, file_path=None, verbose=False):
         # Split into train/test
         self.classification_report = {}
         X_train, X_test, y_train, y_test = train_test_split(self.feature_matrix, self.labels, test_size=0.2, random_state=42)
-        
+        print(f"[Training] X_train shape: {X_train.shape}, X_test shape: {X_test.shape}")
         if verbose:
             #check data distribution
             unique_labels, label_counts = np.unique(y_train, return_counts=True)
@@ -95,14 +102,15 @@ class SVMClassification:
         scaler = StandardScaler()
         X_train = scaler.fit_transform(X_train)
         X_test = scaler.transform(X_test)
+        self.scaler = scaler # Save the scaler for later use
 
         # Set up the SVM and parameter grid
         if find_best_parameters:
             print("\nFinding best parameters...")
             svc = svm.SVC(verbose=False)
             param_grid = {
-                'C': [0.1, 1, 10, 100],          # Regularization parameter
-                'gamma': [1, 0.1, 0.01, 0.001],  # Kernel coefficient
+                'C': C,          # Regularization parameter
+                'gamma': gamma,  # Kernel coefficient
                 'kernel': ['rbf']      # Try both RBF and Linear kernels
             }
 
@@ -119,7 +127,7 @@ class SVMClassification:
 
         else:
             print("\n[Training] Training SVM with fixed parameters...")
-            svc = svm.SVC(C=C, gamma=gamma, kernel='rbf', class_weight='balanced')
+            svc = svm.SVC(C=C[0], gamma=gamma[0], kernel='rbf', class_weight='balanced', probability=True)
             
             svc.fit(X_train, y_train) # Train the SVM
             self.latest_model = svc # Save the model
@@ -131,7 +139,7 @@ class SVMClassification:
 
         self.classification_report['report'] = classification_report(y_test, y_pred, output_dict=True)
         self.report = classification_report(y_test, y_pred, output_dict=False)
-        
+        ConfusionMatrixDisplay.from_predictions(y_test, y_pred, display_labels=self.latest_model.classes_, cmap='Blues')
         #saving report
         if save_report: #save report
             self.save_report(name=model_file_name, file_path=file_path)
@@ -180,16 +188,19 @@ class SVMClassification:
             name = f"svm_model_{self.classification_report['C']}_{self.classification_report['gamma']}"
 
         if file_path is None:
-            file_path = os.path.abspath(os.path.join(os.path.dirname(__file__)))
-            file_path = os.path.join(file_path, "models", f"{name}.joblib")
+            parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__)))
+            file_path = os.path.join(parent_dir, "models", f"{name}.joblib")
+            scaler_path = os.path.join(parent_dir, "models", f"{name}-scaler.pkl")
         else:
             file_path = os.path.join(file_path, f"{name}.joblib")
+            scaler_path = os.path.join(file_path, f"{name}-scaler.pkl")
 
         # check if path exists
         if not os.path.exists(os.path.dirname(file_path)):
             os.makedirs(os.path.dirname(file_path))
         # save model
         dump(self.latest_model, file_path)
+        dump(self.scaler, scaler_path)
         print(f"Model saved to {file_path}")
 
 def run_classification_test():
