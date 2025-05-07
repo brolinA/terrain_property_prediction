@@ -36,7 +36,7 @@ class DataAugmentation:
         """Scale the amplitude of the signal."""
         return signal * scale_factor
 
-    def signal_inversion(self, signal):
+    def signal_inversion(self, signal, param=None):
         """Invert the signal."""
         return -signal
 
@@ -48,12 +48,15 @@ class DataAugmentation:
         f = interp1d(warp, signal, kind='linear', fill_value="extrapolate")
         return f(x)
 
-    def low_pass_filter(self, signal, cutoff):
+    def low_pass_filter(self, signal, cutoff=None):
         """Apply a low-pass filter to the signal."""
         fft_signal = fft(signal)
-        fft_signal[int(cutoff):] = 0
-        return np.real(ifft(fft_signal))
-        # return np.real(fft_signal)
+        if cutoff is None:
+            cutoff = len(signal) // 2
+        # Set frequencies above the cutoff to zero
+        # fft_signal[int(cutoff):] = 0
+        # return np.real(ifft(fft_signal))
+        return np.real(fft_signal)
 
     def interpolate_signals(self, signal1, signal2, alpha=0.5):
         """Interpolate between two signals."""
@@ -101,7 +104,7 @@ def test_data_augmentation():
     scaled_amplitude_signal = augmenter.amplitude_scale(signal, scale_factor=1.5)
     inverted_signal = augmenter.signal_inversion(signal)
     warped_signal = augmenter.time_warp(signal, warp_factor=0.8)
-    filtered_signal = augmenter.low_pass_filter(signal, cutoff=10)
+    filtered_signal = augmenter.low_pass_filter(signal)
 
     # Plot the original and augmented signals
     plt.figure(figsize=(15, 10))
@@ -138,13 +141,13 @@ def test_data_augmentation():
     plt.plot(inverted_signal)
     plt.title("Inverted Signal")
 
-    plt.subplot(3, 3, 9)
-    plt.plot(warped_signal)
-    plt.title("Time Warped Signal")
-
     # plt.subplot(3, 3, 9)
-    # plt.plot(filtered_signal)
-    # plt.title("Filtered Signal")
+    # plt.plot(warped_signal)
+    # plt.title("Time Warped Signal")
+
+    plt.subplot(3, 3, 9)
+    plt.plot(filtered_signal)
+    plt.title("Filtered Signal")
 
     plt.tight_layout()
     plt.show()

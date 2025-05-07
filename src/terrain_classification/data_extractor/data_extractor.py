@@ -49,7 +49,8 @@ class DataExtractor:
             if self.data[col].dtype == 'float64':
                 self.data[col] = self.data[col].round(3)
    
-    def extract_steps(self, normalize_data=False, legs=None, components=None, pad_length=100, combine_components=False):
+    def extract_steps(self, normalize_data=False, legs=None, components=None, pad_length=100, 
+                        combine_components=False, combine_legs = False):
         """Extract the steps from the data.
         Args:
             legs (list): List of legs to extract steps from.
@@ -97,6 +98,21 @@ class DataExtractor:
                 
                 all_components = np.column_stack(all_components)
                 self.steps[leg] = all_components
+        
+        if combine_legs:
+            min_stps = min([self.steps[key_].shape[0] for key_ in  self.steps.keys()])
+
+            for key_ in self.steps.keys():
+                self.steps[key_] = self.steps[key_][:min_stps]
+
+            #convert dict to numpy array
+            stps_array = np.array([self.steps[key_] for key_ in self.steps.keys()])
+
+            #concatenate along columns
+            combined_stps = np.column_stack(stps_array)
+
+            self.steps = {}
+            self.steps['leg'] = combined_stps
                    
     def pad_or_truncate(self, feature, target_length):
         """Pad or truncate a feature vector to a fixed length."""
@@ -140,7 +156,7 @@ class DataExtractor:
 
                 step_segments.append(np.array(contact_data[segment]))
 
-        step_segments = step_segments[1:len(step_segments)-1]  # Remove the first and last segments
+        step_segments = step_segments[2:len(step_segments)-2]  # Remove the first and last segments
         return step_segments
 
     def plot_original_signal(self, column_name):

@@ -31,8 +31,8 @@ class SVMClassification:
         self.original_data = []
     
     def create_feature_matrix_and_label(self, normalize_data=False, legs:list=None, components:list=None, 
-                                        combine_components=False, data_padding_size= 70, augment_data=False,
-                                        augmetation_types=['noise'], augment_params=[0.1]):
+                                        combine_components=False, combine_legs = False, data_padding_size= 100,
+                                        augment_data=False, augmetation_types=['noise'], augment_params=[0.1]):
         """Load and preprocess the data."""
         if legs is None or components is None:
             # Set default values for legs and components
@@ -58,9 +58,18 @@ class SVMClassification:
 
                 self.save_original_data(step) #saving it for later visualization
                 wavelet_result = self.wavelet_analysis.perform_analysis(step, level=None)
+                
+                # fft_signals = []
+                # for signal in step:
+                #     fft_signal = self.data_augmentation.low_pass_filter(signal)
+                #     fft_signals.append(fft_signal)
+
                 for feature in wavelet_result:
                     self.feature_matrix.append(feature.flatten())
                     self.labels.append(label)
+                # for feature, fft_sig in zip(wavelet_result, fft_signals):
+                #     self.feature_matrix.append(np.hstack((feature.flatten(), fft_sig.flatten())))
+                #     self.labels.append(label)
     
         self.feature_matrix = np.array(self.feature_matrix)
         self.labels = np.array(self.labels)
@@ -115,7 +124,7 @@ class SVMClassification:
             }
 
             # Grid Search with 5-fold cross-validation
-            grid = GridSearchCV(svc, param_grid, refit=True, verbose=2, cv=5, n_jobs=-1, error_score='raise')
+            grid = GridSearchCV(svc, param_grid, refit=True, verbose=2, cv=10, n_jobs=-1, error_score='raise')
             grid.fit(X_train, y_train) # Train
             self.latest_model = grid.best_estimator_ # Save the best model
 

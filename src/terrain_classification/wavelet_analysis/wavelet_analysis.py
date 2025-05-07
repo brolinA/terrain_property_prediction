@@ -33,12 +33,13 @@ class WaveletAnalysis:
 
         coeffs = pywt.wavedec(signal, self.wavelet_type, level=max_level)
 
-            # Reconstruct detail coefficients at each level
+        # Reconstruct detail coefficients at each level
         details = []
         for i in range(1, len(coeffs)):
             coeff_list = [np.zeros_like(c) if j != i else coeffs[j] for j, c in enumerate(coeffs)]
             detail = pywt.waverec(coeff_list, self.wavelet_type)
-            details.append(np.abs(detail[:len(signal)]))  # Ensure equal length
+            # details.append(np.abs(detail[:len(signal)]))  # Ensure equal length
+            details.append(np.abs(detail))  # Ensure equal length
         # self.wavelet_results.append(np.vstack(details))  # Store the scalogram-like array
 
         return np.vstack(details)  # Return the scalogram-like array
