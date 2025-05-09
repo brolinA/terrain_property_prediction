@@ -49,6 +49,7 @@ class SVMClassification:
                                             legs=legs, 
                                             components=components,
                                             combine_components=combine_components,
+                                            combine_legs=combine_legs,
                                             pad_length=data_padding_size)
     
             for step in self.data_extractor.steps.values():
