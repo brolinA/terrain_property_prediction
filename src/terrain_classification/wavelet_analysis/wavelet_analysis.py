@@ -45,34 +45,74 @@ class WaveletAnalysis:
         return np.vstack(details)  # Return the scalogram-like array
     
 
-    def plot_wavelet(self, wavelets):
+    def plot_wavelet(self, wavelets, title="wavelet_results"):
         """Plot the wavelet results in an n x n grid."""
         num_segments = len(wavelets)
         grid_size = math.ceil(math.sqrt(num_segments))  # Calculate grid size
 
         # Create subplots
-        fig, axes = plt.subplots(grid_size, grid_size, figsize=(15, 15))
-        axes = axes.flatten()  # Flatten the 2D array of axes for easy iteration
+        if not grid_size == 1:
+            fig, axes = plt.subplots(grid_size, grid_size, figsize=(10, 10))
+            axes = axes.flatten()  # Flatten the 2D array of axes for easy iteration
 
-        # Loop through the wavelet results and plot each one
-        for i, scalogram_array in enumerate(wavelets):
-            extent = [0, len(self.input_signal), 1, scalogram_array.shape[0]]
-            axes[i].imshow(scalogram_array, extent=extent, aspect='auto', cmap='jet', origin='lower')
-            axes[i].set_title(f"Segment {i + 1}")
-            axes[i].set_xlabel('Time')
-            axes[i].set_ylabel('Decomposition Level')
-            axes[i].set_yticks(np.arange(1, scalogram_array.shape[0] + 1))  # Set integer y-ticks
+            # Loop through the wavelet results and plot each one
+            for i, scalogram_array in enumerate(wavelets):
+                extent = [0, len(self.input_signal) if self.input_signal is not None else 0, 1, scalogram_array.shape[0]]
+                axes[i].imshow(scalogram_array, extent=extent, aspect='auto', cmap='jet', origin='lower')
+                axes[i].set_title(f"Segment {i + 1}")
+                axes[i].set_xlabel('Time')
+                axes[i].set_ylabel('Level')
+                axes[i].set_yticks(np.arange(1, scalogram_array.shape[0] + 1))  # Set integer y-ticks
 
-        # Hide any unused subplots
-        for j in range(num_segments, len(axes)):
-            axes[j].axis('off')
+            # Hide any unused subplots
+            for j in range(num_segments, len(axes)):
+                axes[j].axis('off')
+        else:
+            plt.figure(figsize=(10,10))
+            plt.imshow(wavelets[0], aspect='auto', cmap='jet', origin='lower')
+            plt.title("Wavelet")
+            plt.xlabel("Time")
+            plt.ylabel("Level")
+            plt.yticks(np.arange(1, len(wavelets) + 1))
 
         # Adjust layout
+        plt.suptitle(title)
         plt.tight_layout()
         plt.show()
 
-    def plot_results(self):
-        self.plot_wavelet(self.wavelet_results)
+    def plot_results(self, title="results"):
+        self.plot_wavelet(self.wavelet_results, title)
+
+    def plot_signals(self):
+        if not self.input_signal == None:
+            num_segments = len(self.input_signal)
+            grid_size = math.ceil(math.sqrt(num_segments))  # Calculate grid size
+
+            # Create subplots
+            if not grid_size == 1:
+                fig, axes = plt.subplots(grid_size, grid_size, figsize=(5, 5))
+                axes = axes.flatten()  # Flatten the 2D array of axes for easy iteration
+
+                # Loop through the wavelet results and plot each one
+                for i, sig in enumerate(self.input_signal):
+                    axes[i].plot(sig)
+                    axes[i].set_title(f"Signal {i + 1}")
+                    axes[i].set_xlabel('Time')
+                    axes[i].set_ylabel('Amplitude')
+
+                # Hide any unused subplots
+                for j in range(num_segments, len(axes)):
+                    axes[j].axis('off')
+            else:
+                plt.figure(figsize=(5,5))
+                plt.plot(self.input_signal)
+                plt.title("Input signal")
+                plt.xlabel("Time")
+                plt.ylabel("Amplitude")
+
+            # Adjust layout
+            plt.tight_layout()
+            plt.show()
 
 def run_WaveletAnalysis():
     # sample signal for testing

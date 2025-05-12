@@ -86,7 +86,7 @@ class DataExtractor:
                 
                 if not combine_components:
                     # if we are not combining components, then we need to store the steps for each component
-                    self.steps[col_name] = all_components[0]
+                    self.steps[col_name] = np.array(all_components[0])
                     all_components = [] #rest the all_components list
                     
             if combine_components:
@@ -167,12 +167,12 @@ class DataExtractor:
         # Check if the column exists in the DataFrame
         if column_name in self.data.columns:
             plt.plot(self.data[column_name])
-            plt.title('Original Signal')
+            plt.title(column_name)
             plt.xlabel('Sample Number')
             plt.ylabel('Amplitude')
             plt.show()
 
-    def plot_steps(self, col_name):
+    def plot_steps(self, col_name, no_of_samples=-1):
         """Plot the steps for the given column name.
         Args:
             col_name (str): The name of the column to plot.
@@ -182,27 +182,39 @@ class DataExtractor:
         if not col_name in self.steps:
             print(f"[DataExtractor] Cannot plot. Column '{col_name}' not found in the steps dictionary.")
             return
-        steps = self.steps[col_name]
+        if not no_of_samples == -1:
+            idx = np.random.choice(range(1, len(self.steps[col_name])), size=no_of_samples, replace=False)
+            steps = np.array(self.steps[col_name])[idx.tolist()]
+        else:
+            steps = self.steps[col_name]
+        
         num_segments = len(steps)
         grid_size = math.ceil(math.sqrt(num_segments))  # n x n grid
 
         # Create the subplots
-        fig, axes = plt.subplots(grid_size, grid_size, figsize=(10, 10))
-        axes = axes.flatten()  # Flatten the 2D array of axes for easy iteration
+        if grid_size > 1:
+            fig, axes = plt.subplots(grid_size, grid_size, figsize=(10, 10))
+            axes = axes.flatten()  # Flatten the 2D array of axes for easy iteration
 
-        # Loop through the segments and plot each one
-        for i, segment in enumerate(steps):
-            axes[i].plot(segment)
-            axes[i].set_title(f"Segment {i + 1}")
-            axes[i].grid(True)
+            # Loop through the segments and plot each one
+            for i, segment in enumerate(steps):
+                axes[i].plot(segment)
+                axes[i].set_title(f"Segment {i + 1}")
+                axes[i].grid(True)
 
-        # Hide any unused subplots
-        for j in range(num_segments, len(axes)):
-            axes[j].axis('off')
+            # Hide any unused subplots
+            for j in range(num_segments, len(axes)):
+                axes[j].axis('off')
+        else:
+            plt.plot(steps[0])
+            # plt.xlabel("samples")
 
         # Adjust layout
+        plt.suptitle(col_name)
         plt.tight_layout()
         plt.show()
+
+        return steps #return the steps ploted
 
 def run_data_extractor():
     """Run the data extraction process."""
