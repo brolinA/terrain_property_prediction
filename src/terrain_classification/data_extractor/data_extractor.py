@@ -141,20 +141,21 @@ class DataExtractor:
 
         # Extract the non-zero values for each segment
         step_segments = []
-        for segment in step_segment_index:
-            start_idx = segment[0] - 1  # Include the zero before the segment
-            end_idx = segment[-1] + 1  # Include the zero after the segment
+        for segment_id in step_segment_index:
+            start_idx = segment_id[0] - 1  # Include the zero before the segment
+            end_idx = segment_id[-1] + 1  # Include the zero after the segment
             
             if start_idx >= 0 and contact_data[start_idx] == 0:  # Ensure it's a valid zero
-                segment = np.insert(segment, 0, start_idx)
+                segment_id = np.insert(segment_id, 0, start_idx)
             if end_idx < len(contact_data) and contact_data[end_idx] == 0:  # Ensure it's a valid trailing zero
-                segment = np.append(segment, end_idx)
+                segment_id = np.append(segment_id, end_idx)
             
-            if len(segment) > 15: #to ensure that we have enought data in the step
-                if(not len(segment) == pad_length):
-                    segment = self.pad_or_truncate(segment, pad_length)
+            seg_values = np.array(contact_data[segment_id])
+            if len(seg_values) > 15: #to ensure that we have enought data in the step
+                if(not len(seg_values) == pad_length):
+                    seg_values = self.pad_or_truncate(seg_values, pad_length)
 
-                step_segments.append(np.array(contact_data[segment]))
+                step_segments.append(seg_values)
 
         step_segments = step_segments[2:len(step_segments)-2]  # Remove the first and last segments
         return step_segments
