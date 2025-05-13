@@ -32,7 +32,7 @@ class SVMClassification:
     
     def create_feature_matrix_and_label(self, normalize_data=False, legs:list=None, components:list=None, 
                                         combine_components=False, combine_legs = False, data_padding_size= 100,
-                                        augment_data=False, augmetation_types=['noise'], augment_params=[0.1]):
+                                        augment_data=False, augmetation_types=['noise'], augment_params=[0.1], feature_level=None):
         """Load and preprocess the data."""
         if legs is None or components is None:
             # Set default values for legs and components
@@ -58,7 +58,7 @@ class SVMClassification:
                     step = self.augment_data(step, augmetation_types, augment_params)
 
                 self.save_original_data(step) #saving it for later visualization
-                wavelet_result = self.wavelet_analysis.perform_analysis(step, level=None)
+                wavelet_result = self.wavelet_analysis.perform_analysis(step, level=feature_level)
                 
                 # fft_signals = []
                 # for signal in step:
@@ -100,8 +100,8 @@ class SVMClassification:
         # Split into train/test
         self.classification_report = {}
         X_train, X_test, y_train, y_test = train_test_split(self.feature_matrix, self.labels, test_size=0.2, random_state=42)
-        print(f"[Training] X_train shape: {X_train.shape}, X_test shape: {X_test.shape}")
         if verbose:
+            print(f"[Training] X_train shape: {X_train.shape}, X_test shape: {X_test.shape}")
             #check data distribution
             unique_labels, label_counts = np.unique(y_train, return_counts=True)
             for label, count in zip(unique_labels, label_counts):
@@ -116,7 +116,8 @@ class SVMClassification:
 
         # Set up the SVM and parameter grid
         if find_best_parameters:
-            print("\nFinding best parameters...")
+            if verbose:
+                print("\nFinding best parameters...")
             svc = svm.SVC(verbose=False)
             param_grid = {
                 'C': C,          # Regularization parameter
@@ -125,7 +126,7 @@ class SVMClassification:
             }
 
             # Grid Search with 5-fold cross-validation
-            grid = GridSearchCV(svc, param_grid, refit=True, verbose=2, cv=10, n_jobs=-1, error_score='raise')
+            grid = GridSearchCV(svc, param_grid, refit=True, verbose=0, cv=10, n_jobs=-1, error_score='raise')
             grid.fit(X_train, y_train) # Train
             self.latest_model = grid.best_estimator_ # Save the best model
 
@@ -149,7 +150,7 @@ class SVMClassification:
 
         self.classification_report['report'] = classification_report(y_test, y_pred, output_dict=True)
         self.report = classification_report(y_test, y_pred, output_dict=False)
-        ConfusionMatrixDisplay.from_predictions(y_test, y_pred, display_labels=self.latest_model.classes_, cmap='Blues')
+        # ConfusionMatrixDisplay.from_predictions(y_test, y_pred, display_labels=self.latest_model.classes_, cmap='Blues')
         #saving report
         if save_report: #save report
             self.save_report(name=model_file_name, file_path=file_path)
