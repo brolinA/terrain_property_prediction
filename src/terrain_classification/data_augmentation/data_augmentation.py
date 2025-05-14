@@ -57,11 +57,7 @@ class DataAugmentation:
         # fft_signal[int(cutoff):] = 0
         # return np.real(ifft(fft_signal))
         return np.real(fft_signal)
-
-    def interpolate_signals(self, signal1, signal2, alpha=0.5):
-        """Interpolate between two signals."""
-        return alpha * signal1 + (1 - alpha) * signal2
-    
+   
     def augment_signal(self, signal, type, param):
         """Augment the signal based on the specified type and parameters."""
         if type == 'time_shift':
@@ -80,12 +76,12 @@ class DataAugmentation:
             return self.signal_inversion(signal)
         elif type == 'time_warp':
             return self.time_warp(signal, param)
-        elif type == 'low_pass_filter':
+        elif type == 'low_pass_filter' or 'fft':
             return self.low_pass_filter(signal, param)
         else:
-            raise ValueError("Unknown augmentation type. Given {type} but expected one of ['time_shift', 'time_scale',\
-                              'random_crop', 'pad_or_truncate', 'add_noise', 'amplitude_scale', 'signal_inversion',\
-                              'time_warp', 'low_pass_filter']")
+            raise ValueError(f"Unknown augmentation type. Given {type} but expected one of ['time_shift', 'time_scale',"
+                              "'random_crop', 'pad_or_truncate', 'add_noise', 'amplitude_scale', 'signal_inversion',"
+                              "'time_warp', 'low_pass_filter']")
 
 def test_data_augmentation():
     # Create a sample signal

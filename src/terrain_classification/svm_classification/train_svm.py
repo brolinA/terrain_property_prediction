@@ -32,7 +32,7 @@ class SVMClassification:
     
     def create_feature_matrix_and_label(self, normalize_data=False, legs:list=None, components:list=None, 
                                         combine_components=False, combine_legs = False, data_padding_size= 100,
-                                        augment_data=False, augmetation_types=['noise'], augment_params=[0.1], feature_level=None):
+                                        use_original_signal=False, augmetation_params={'wavelet': None}):
         """Load and preprocess the data."""
         if legs is None or components is None:
             # Set default values for legs and components
@@ -40,6 +40,7 @@ class SVMClassification:
             components = ['z']
             print(f"Using default legs: {legs} and components: {components}")
 
+        print(f"Applying the following augmentations: {augmetation_params}")
         for file_path, label in self.data_paths.items():
             # print(f"Loading data from {file_path} with label {label}")
             self.data_extractor.load_data(file_path)  # Load the data
@@ -51,26 +52,28 @@ class SVMClassification:
                                             combine_components=combine_components,
                                             combine_legs=combine_legs,
                                             pad_length=data_padding_size)
-    
-            for step in self.data_extractor.steps.values():
-                #apply all data augmentation methods
-                if augment_data:
-                    step = self.augment_data(step, augmetation_types, augment_params)
+            #run through every setp signal and apply the given augmentations to create the feature matrix
+            for steps in self.data_extractor.steps.values():
+                for signal in steps:
+                    self.original_data.append(signal) #save the original signal if required later
+                    augmented_signal = [] #create an empty list to append the augmented signals
+                    if use_original_signal: #add the original step signal if needed
+                        augmented_signal = signal
+                    
+                    #apply all the augmentations given
+                    for augmentation_key in augmetation_params.keys():
+                        augmentation = None
+                        if augmentation_key == 'wavelet':
+                            augmentation = self.wavelet_analysis.extract_details(signal, augmetation_params[augmentation_key])
+                        else:
+                            augmentation = self.data_augmentation.augment_signal(signal, augmentation_key, augmetation_params[augmentation_key])
 
-                self.save_original_data(step) #saving it for later visualization
-                wavelet_result = self.wavelet_analysis.perform_analysis(step, level=feature_level)
-                
-                # fft_signals = []
-                # for signal in step:
-                #     fft_signal = self.data_augmentation.low_pass_filter(signal)
-                #     fft_signals.append(fft_signal)
+                        #stack the augmentations horizontally next to each other
+                        augmented_signal = np.hstack((augmented_signal, augmentation.flatten()))
 
-                for feature in wavelet_result:
-                    self.feature_matrix.append(feature.flatten())
-                    self.labels.append(label)
-                # for feature, fft_sig in zip(wavelet_result, fft_signals):
-                #     self.feature_matrix.append(np.hstack((feature.flatten(), fft_sig.flatten())))
-                #     self.labels.append(label)
+                    #once all augmentation are done add it to feature matrix
+                    self.feature_matrix.append(augmented_signal)
+                    self.labels.append(label) 
     
         self.feature_matrix = np.array(self.feature_matrix)
         self.labels = np.array(self.labels)
