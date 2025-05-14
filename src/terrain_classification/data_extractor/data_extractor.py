@@ -151,6 +151,11 @@ class DataExtractor:
                 segment_id = np.append(segment_id, end_idx)
             
             seg_values = np.array(contact_data[segment_id])
+            #clip max values
+            peak_val = max(seg_values)
+            #set values to zero
+            peak_ids = np.where(seg_values > peak_val/2)[0]
+            seg_values[peak_ids] = 0
             if len(seg_values) > 15: #to ensure that we have enought data in the step
                 if(not len(seg_values) == pad_length):
                     seg_values = self.pad_or_truncate(seg_values, pad_length)
