@@ -64,7 +64,9 @@ private:
     std::vector<Data::Matrix6x> frame_jacobian_; //!< storing frame Jacobian separately.
 
     std::vector<std::string> contact_points_; //!< name of all the contact points for which we want to calculate force
-    
+
+    std::vector<std::string> joint_names_; //!< to store the joint names
+
     std::vector<FrameIndex> contact_pt_ids_; //!< Id of the contact frames if they exist.
 
     bool odom_available_ = false; //!< Variable to indicate if the odom data has be received
@@ -149,6 +151,8 @@ private:
     
     ros::Publisher normalized_force_component_pub_; //!< publish the normalized force as x,y,z components per leg
 
+    ros::Publisher joint_torque_pub_; //!< publish the averaged joint torque values
+
     std::vector<DataNormalizer> normalized_force_mangitude_; //!< vector to store the forces magnitudes for each leg
 
     std::vector<DataNormalizer> normalized_force_component_; //!< vector to store the forces components for each leg
@@ -213,6 +217,11 @@ private:
      * @param foot_forces - vector with force magnitude for each leg
      */
     void publishFootForce(Eigen::Vector4d foot_forces);
+
+    /*!
+     * @brief Function to publish only the torque values
+     */
+    void publishJointTorque();
 
 }; //end computeInverseDynamics
 

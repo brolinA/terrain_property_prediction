@@ -24,6 +24,7 @@ computeInverseDynamics::computeInverseDynamics(std::string robot_model_path)
   pinocchio_debug_pub_ = nh_.advertise<aliengo_dynamics_computer::PinocchioDebug>("pinocchio_debug", 10);
   normalized_force_pub_ = nh_.advertise<aliengo_dynamics_computer::FootForces>("normalized_pinocchio_leg_forces_magnitude", 10);
   normalized_force_component_pub_ = nh_.advertise<aliengo_dynamics_computer::ReactionForce>("normalized_pinocchio_leg_forces_components", 10);
+  joint_torque_pub_ = nh_.advertise<sensor_msgs::JointState>("joint_torque", 10);
   joint_data_sub_ = nh_.subscribe("/joint_states", 10, &computeInverseDynamics::jointDataCallback, this);
   odom_sub_ = nh_.subscribe("/odom", 10, &computeInverseDynamics::odometryCallback, this);
   
@@ -93,8 +94,13 @@ void computeInverseDynamics::jointDataCallback(const sensor_msgs::JointState::Co
 	if(robot_model_created_ && 
 		 !joint_data->position.empty() &&
 		 !joint_data->velocity.empty() &&
-		 !joint_data->effort.empty())
+		 !joint_data->effort.empty()){
+		joint_names_ = joint_data->name;
 		robot_dynamic_data_.update(*joint_data, robot_model_);
+	}
+
+	if(robot_dynamic_data_.dynamics_data_updated_)
+		publishJointTorque();
 }
 
 void computeInverseDynamics::robotDynamicsData::update(sensor_msgs::JointState joint_data, Model robot_model)
@@ -277,4 +283,20 @@ void computeInverseDynamics::publishFootForce(Eigen::Vector4d foot_forces)
 		normalized_forces.header.frame_id = "base";
 		normalized_force_pub_.publish(normalized_forces);
 	}
+}
+
+void computeInverseDynamics::publishJointTorque()
+{
+	sensor_msgs::JointState joint_state;
+
+	joint_state.header.stamp = ros::Time::now();
+	joint_state.name = joint_names_;
+	std::vector<float> effort_float = util_func_.eigenToStlVector(robot_dynamic_data_.joint_torque_);
+	std::vector<double> joint_effort(effort_float.size());
+	
+	//convert float datatype into double to be published in the topic
+	std::transform(effort_float.begin(), effort_float.end(), joint_effort.begin(), 
+		[](float f) { return static_cast<double>(f); });
+	joint_state.effort = joint_effort;
+	joint_torque_pub_.publish(joint_state);
 }
