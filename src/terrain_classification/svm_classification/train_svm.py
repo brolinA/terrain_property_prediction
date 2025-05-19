@@ -30,15 +30,10 @@ class SVMClassification:
         self.data_augmentation = DataAugmentation()
         self.original_data = []
     
-    def create_feature_matrix_and_label(self, normalize_data=False, legs:list=None, components:list=None, 
-                                        combine_components=False, combine_legs = False, data_padding_size= 100,
-                                        use_original_signal=False, augmetation_params={'wavelet': None}):
+    def create_feature_matrix_and_label(self, normalize_data=False, components:dict=None, combine_legs = False, 
+                                        data_padding_size= 100, use_original_signal=False, 
+                                        augmetation_params={'wavelet': None}):
         """Load and preprocess the data."""
-        if legs is None or components is None:
-            # Set default values for legs and components
-            legs = ['fl']
-            components = ['z']
-            print(f"Using default legs: {legs} and components: {components}")
 
         print(f"Applying the following augmentations: {augmetation_params}")
         for file_path, label in self.data_paths.items():
@@ -47,9 +42,7 @@ class SVMClassification:
     
             # Extract steps from the data
             self.data_extractor.extract_steps(normalize_data=normalize_data,
-                                            legs=legs, 
                                             components=components,
-                                            combine_components=combine_components,
                                             combine_legs=combine_legs,
                                             pad_length=data_padding_size)
             #run through every setp signal and apply the given augmentations to create the feature matrix

@@ -49,28 +49,25 @@ class DataExtractor:
             if self.data[col].dtype == 'float64':
                 self.data[col] = self.data[col].round(3)
    
-    def extract_steps(self, normalize_data=False, legs=None, components=None, pad_length=100, 
-                        combine_components=False, combine_legs = False):
+    def extract_steps(self, normalize_data=False, components:dict=None, pad_length=100, 
+                        combine_legs = False):
         """Extract the steps from the data.
         Args:
             legs (list): List of legs to extract steps from.
             components (list): List of components to extract steps from.
         """
-
-        if legs is None:
-            #print error message and exit
-            print("Error: 'legs' parameter is not provided. Please provide a list of legs.")
-            return
         
         if components is None:
             print("Error: 'components' parameter is not provided. Please provide a list of component.")
             return
 
-        for leg in legs:
+        for comp_key in components.keys():
             all_components = []
-            for component in components:
-                col_name = f"{leg}-{component}"
-                contact_col_name = f"{leg}-contact"
+            leg = comp_key[0:2] #extracting leg name from contact name
+            contact_col_name = comp_key
+
+            for component in components[comp_key]:
+                col_name = component
                 
                 if not col_name in self.data.columns or not contact_col_name in self.data.columns:
                     print(f"[DataExtractor] Column '{col_name}' or '{contact_col_name}' not found in the DataFrame.")
@@ -83,13 +80,8 @@ class DataExtractor:
                     #Normalize onle the last component if you are combining components
                     for j in range(len(all_components[-1])):
                         all_components[-1][j] = pre.MinMaxScaler().fit_transform(np.array(all_components[-1][j]).reshape(-1, 1)).flatten()
-                
-                if not combine_components:
-                    # if we are not combining components, then we need to store the steps for each component
-                    self.steps[col_name] = np.array(all_components[0])
-                    all_components = [] #rest the all_components list
                     
-            if combine_components:
+            if not (len(all_components)==0):
                 #combine all components colomn wise
                 min_len = min([len(x) for x in all_components])
                 # Truncate all segments to the minimum length to do column-wise stacking
@@ -99,7 +91,7 @@ class DataExtractor:
                 all_components = np.column_stack(all_components)
                 self.steps[leg] = all_components
         
-        if combine_legs:
+        if combine_legs and not (len(self.steps.items())==0):
             min_stps = min([self.steps[key_].shape[0] for key_ in  self.steps.keys()])
 
             for key_ in self.steps.keys():
