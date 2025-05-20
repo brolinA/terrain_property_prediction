@@ -27,6 +27,8 @@ computeInverseDynamics::computeInverseDynamics(std::string robot_model_path)
   joint_torque_pub_ = nh_.advertise<sensor_msgs::JointState>("joint_torque", 10);
   joint_data_sub_ = nh_.subscribe("/joint_states", 10, &computeInverseDynamics::jointDataCallback, this);
   odom_sub_ = nh_.subscribe("/odom", 10, &computeInverseDynamics::odometryCallback, this);
+  joint_torque_timer_ = nh_.createTimer(ros::Duration(1.0/200.00), 
+  										std::bind(&computeInverseDynamics::publishJointTorque, this));
   
 	ROS_INFO("Successfully initialized pinocchio force transformer");
 }
@@ -99,8 +101,6 @@ void computeInverseDynamics::jointDataCallback(const sensor_msgs::JointState::Co
 		robot_dynamic_data_.update(*joint_data, robot_model_);
 	}
 
-	if(robot_dynamic_data_.dynamics_data_updated_)
-		publishJointTorque();
 }
 
 void computeInverseDynamics::robotDynamicsData::update(sensor_msgs::JointState joint_data, Model robot_model)
@@ -287,16 +287,18 @@ void computeInverseDynamics::publishFootForce(Eigen::Vector4d foot_forces)
 
 void computeInverseDynamics::publishJointTorque()
 {
-	sensor_msgs::JointState joint_state;
+	if(robot_dynamic_data_.dynamics_data_updated_){
+		sensor_msgs::JointState joint_state;
 
-	joint_state.header.stamp = ros::Time::now();
-	joint_state.name = joint_names_;
-	std::vector<float> effort_float = util_func_.eigenToStlVector(robot_dynamic_data_.joint_torque_);
-	std::vector<double> joint_effort(effort_float.size());
-	
-	//convert float datatype into double to be published in the topic
-	std::transform(effort_float.begin(), effort_float.end(), joint_effort.begin(), 
-		[](float f) { return static_cast<double>(f); });
-	joint_state.effort = joint_effort;
-	joint_torque_pub_.publish(joint_state);
+		joint_state.header.stamp = ros::Time::now();
+		joint_state.name = joint_names_;
+		std::vector<float> effort_float = util_func_.eigenToStlVector(robot_dynamic_data_.joint_torque_);
+		std::vector<double> joint_effort(effort_float.size());
+		
+		//convert float datatype into double to be published in the topic
+		std::transform(effort_float.begin(), effort_float.end(), joint_effort.begin(), 
+			[](float f) { return static_cast<double>(f); });
+		joint_state.effort = joint_effort;
+		joint_torque_pub_.publish(joint_state);
+	}
 }

@@ -151,7 +151,9 @@ private:
     
     ros::Publisher normalized_force_component_pub_; //!< publish the normalized force as x,y,z components per leg
 
-    ros::Publisher joint_torque_pub_; //!< publish the averaged joint torque values
+    ros::Publisher joint_torque_pub_; //!< publish the averaged joint torque values\
+
+    ros::Timer joint_torque_timer_; //!< timer to publish the joint torque values
 
     std::vector<DataNormalizer> normalized_force_mangitude_; //!< vector to store the forces magnitudes for each leg
 
