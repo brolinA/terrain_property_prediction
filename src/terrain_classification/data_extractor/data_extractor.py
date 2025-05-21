@@ -129,7 +129,8 @@ class DataExtractor:
         
         non_zero_pts = np.where(contact_data != 0)[0]
         # Split the array into segments of consecutive non-zero values
-        step_segment_index = np.split(non_zero_pts, np.where(np.diff(non_zero_pts) != 1)[0] + 1)
+        # step_segment_index = np.split(non_zero_pts, np.where(np.diff(non_zero_pts) != 1)[0] + 1)
+        step_segment_index = np.split(contact_idx, np.where(np.diff(contact_idx) != 1)[0] + 1)
 
         # Extract the non-zero values for each segment
         step_segments = []
@@ -137,17 +138,17 @@ class DataExtractor:
             start_idx = segment_id[0] - 1  # Include the zero before the segment
             end_idx = segment_id[-1] + 1  # Include the zero after the segment
             
-            if start_idx >= 0 and contact_data[start_idx] == 0:  # Ensure it's a valid zero
-                segment_id = np.insert(segment_id, 0, start_idx)
-            if end_idx < len(contact_data) and contact_data[end_idx] == 0:  # Ensure it's a valid trailing zero
-                segment_id = np.append(segment_id, end_idx)
-            
-            seg_values = np.array(contact_data[segment_id])
+            # if start_idx >= 0 and contact_data[start_idx] == 0:  # Ensure it's a valid zero
+            #     segment_id = np.insert(segment_id, 0, start_idx)
+            # if end_idx < len(contact_data) and contact_data[end_idx] == 0:  # Ensure it's a valid trailing zero
+            #     segment_id = np.append(segment_id, end_idx)
+
+            seg_values = np.array(data_column[segment_id])
             #clip max values
-            peak_val = max(seg_values)
-            #set values to zero
-            peak_ids = np.where(seg_values > peak_val/2)[0]
-            seg_values[peak_ids] = 0
+            # peak_val = max(seg_values)
+            # #set values to zero
+            # peak_ids = np.where(seg_values > peak_val/2)[0]
+            # seg_values[peak_ids] = 0
             if len(seg_values) > 15: #to ensure that we have enought data in the step
                 if(not len(seg_values) == pad_length):
                     seg_values = self.pad_or_truncate(seg_values, pad_length)
