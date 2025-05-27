@@ -1,4 +1,5 @@
 # import modules
+from copy import deepcopy
 import os
 from terrain_classification.data_extractor.data_extractor import DataExtractor
 from terrain_classification.wavelet_analysis.wavelet_analysis import WaveletAnalysis
@@ -36,6 +37,10 @@ class SVMClassification:
         """Load and preprocess the data."""
 
         print(f"Applying the following augmentations: {augmetation_params}")
+        if len(augmetation_params) == 0 and not use_original_signal:
+            print("No augmentation provided and original signal is not used. So cannot create feature matrix")
+            return np.empty([])
+        
         for file_path, label in self.data_paths.items():
             # print(f"Loading data from {file_path} with label {label}")
             self.data_extractor.load_data(file_path)  # Load the data
@@ -46,24 +51,36 @@ class SVMClassification:
                                             combine_legs=combine_legs,
                                             pad_length=data_padding_size)
             #run through every setp signal and apply the given augmentations to create the feature matrix
-            for steps in self.data_extractor.steps.values():
-                for signal in steps:
-                    self.original_data.append(signal) #save the original signal if required later
-                    augmented_signal = [] #create an empty list to append the augmented signals
-                    if use_original_signal: #add the original step signal if needed
-                        augmented_signal = signal
+            for component_key_ in components.keys():
+                leg_components = components[component_key_]
+                for step_number in range (len(leg_components[0])): #iterate through individual step signal 
+                    augmented_signal = []  
+                    curr_augmentations = deepcopy(augmetation_params)
+                    if use_original_signal: #compute the interleaved signal
+                        interleave_ = self.data_augmentation.interleave_signal(self.data_extractor.steps, leg_components, step_number )
+                        augmented_signal = np.hstack((augmented_signal, interleave_.flatten()))
+                        self.original_data.append(augmented_signal) #save the original signal if required later
+
+                    if "correlation" in curr_augmentations:
+                        correlation_ = self.data_augmentation.correlation_matrix(self.data_extractor.steps, leg_components, step_number )
+                        augmented_signal = np.hstack((augmented_signal, correlation_.tolist()))
+                        del curr_augmentations['correlation'] #remove before proceeding
+
+                    #run though each leg components and compute the other augmentations.
+                    for leg_component in leg_components: # for each component
+                        for augmentation_type in curr_augmentations.keys(): #apply each augmentation
+                            augmentation = []
+                            signal = self.data_extractor.steps[leg_component][step_number]
+                            
+                            if augmentation_type == 'wavelet':
+                                augmentation = self.wavelet_analysis.extract_details(signal, curr_augmentations[augmentation_type])
+                            else:
+                                augmentation = self.data_augmentation.augment_signal(signal, augmentation_type, curr_augmentations[augmentation_type])
+
+                            #stack the augmentations horizontally next to each other
+                            if not len(augmentation)==0:
+                                augmented_signal = np.hstack((augmented_signal, augmentation.flatten()))
                     
-                    #apply all the augmentations given
-                    for augmentation_key in augmetation_params.keys():
-                        augmentation = None
-                        if augmentation_key == 'wavelet':
-                            augmentation = self.wavelet_analysis.extract_details(signal, augmetation_params[augmentation_key])
-                        else:
-                            augmentation = self.data_augmentation.augment_signal(signal, augmentation_key, augmetation_params[augmentation_key])
-
-                        #stack the augmentations horizontally next to each other
-                        augmented_signal = np.hstack((augmented_signal, augmentation.flatten()))
-
                     #once all augmentation are done add it to feature matrix
                     self.feature_matrix.append(augmented_signal)
                     self.labels.append(label) 
@@ -146,7 +163,7 @@ class SVMClassification:
 
         self.classification_report['report'] = classification_report(y_test, y_pred, output_dict=True)
         self.report = classification_report(y_test, y_pred, output_dict=False)
-        # ConfusionMatrixDisplay.from_predictions(y_test, y_pred, display_labels=self.latest_model.classes_, cmap='Blues')
+        ConfusionMatrixDisplay.from_predictions(y_test, y_pred, display_labels=self.latest_model.classes_, cmap='Blues')
         #saving report
         if save_report: #save report
             self.save_report(name=model_file_name, file_path=file_path)

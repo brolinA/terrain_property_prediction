@@ -62,8 +62,8 @@ class DataExtractor:
             return
 
         for comp_key in components.keys():
-            all_components = []
-            leg = comp_key[0:2] #extracting leg name from contact name
+
+            # leg = comp_key[0:2] #extracting leg name from contact name
             contact_col_name = comp_key
 
             for component in components[comp_key]:
@@ -74,22 +74,13 @@ class DataExtractor:
                     continue
                 
                 # Extract the data for the specified leg and component
-                all_components.append(self.extract_step_from_column(self.data[col_name].to_numpy(), self.data[contact_col_name], pad_length))
+                step = (self.extract_step_from_column(self.data[col_name].to_numpy(), self.data[contact_col_name], pad_length))
+
                 if normalize_data:
-                    # Normalize the data to be between 0 and 1
-                    #Normalize onle the last component if you are combining components
-                    for j in range(len(all_components[-1])):
-                        all_components[-1][j] = pre.MinMaxScaler().fit_transform(np.array(all_components[-1][j]).reshape(-1, 1)).flatten()
-                    
-            if not (len(all_components)==0):
-                #combine all components colomn wise
-                min_len = min([len(x) for x in all_components])
-                # Truncate all segments to the minimum length to do column-wise stacking
-                for i in range(len(all_components)):                    
-                    all_components[i] = all_components[i][:min_len]
+                    step = pre.MinMaxScaler().fit_transform(np.array(step).reshape(-1, 1)).flatten()
                 
-                all_components = np.column_stack(all_components)
-                self.steps[leg] = all_components
+                #we need to store the steps for each component
+                self.steps[col_name] = np.array(step)
         
         if combine_legs and not (len(self.steps.items())==0):
             min_stps = min([self.steps[key_].shape[0] for key_ in  self.steps.keys()])
