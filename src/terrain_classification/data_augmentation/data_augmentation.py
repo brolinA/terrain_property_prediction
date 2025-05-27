@@ -57,7 +57,38 @@ class DataAugmentation:
         # fft_signal[int(cutoff):] = 0
         # return np.real(ifft(fft_signal))
         return np.real(fft_signal)
-   
+    
+    def combine_signals(self, signals, components:dict=None):
+        combined_signals = {}
+        if components==None or len(components.items())==0:
+            print("Cannot combine signals since components list is either empty or None.")
+            return combined_signals
+
+        for key_ in components.keys():
+            if(len(components[key_])==0):
+                print(f"{key_} has no components to combine. So skipping..")
+                continue
+
+            vals = components[key_]
+            no_of_steps = len(signals[vals[0]]) #get the number of steps to reshape the data
+
+            steps_to_stack = [np.array(signals[val]).flatten() for val in vals]
+            combined_signals[key_] = np.column_stack(steps_to_stack).reshape(no_of_steps, -1)
+        
+        return combined_signals
+    
+    def interleave_signal (self, signals, components:list, index):
+        steps_to_stack = [np.array(signals[comp][index]).flatten() for comp in components]
+        return np.column_stack(steps_to_stack)
+    
+    def correlation_matrix(self, signals, components:list, index):
+        correlation_variables = [np.array(signals[comp][index]).flatten() for comp in components]
+        correlation = np.corrcoef(correlation_variables)
+        #get the upper triangular matrix above the diagonal
+        up_tri = np.triu(correlation, k=1)
+        #get the non-zero values and flatten it.
+        return up_tri[np.nonzero(up_tri)]
+    
     def augment_signal(self, signal, type, param):
         """Augment the signal based on the specified type and parameters."""
         if type == 'time_shift':
@@ -76,12 +107,13 @@ class DataAugmentation:
             return self.signal_inversion(signal)
         elif type == 'time_warp':
             return self.time_warp(signal, param)
-        elif type == 'low_pass_filter' or 'fft':
+        elif type == 'low_pass_filter' or type =='fft':
             return self.low_pass_filter(signal, param)
         else:
-            raise ValueError(f"Unknown augmentation type. Given {type} but expected one of ['time_shift', 'time_scale',"
+            print(f"Unknown augmentation type. Given {type} but expected one of ['time_shift', 'time_scale',"
                               "'random_crop', 'pad_or_truncate', 'add_noise', 'amplitude_scale', 'signal_inversion',"
                               "'time_warp', 'low_pass_filter']")
+            return []
 
 def test_data_augmentation():
     # Create a sample signal
