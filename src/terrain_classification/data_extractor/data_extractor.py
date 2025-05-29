@@ -74,13 +74,16 @@ class DataExtractor:
                     continue
                 
                 # Extract the data for the specified leg and component
-                step = (self.extract_step_from_column(self.data[col_name].to_numpy(), self.data[contact_col_name], pad_length))
+                step = self.extract_step_from_column(self.data[col_name].to_numpy(), self.data[contact_col_name], pad_length)
 
                 if normalize_data:
-                    step = pre.MinMaxScaler().fit_transform(np.array(step).reshape(-1, 1)).flatten()
-                
+                    # Normalize the data to be between 0 and 1
+                    #Normalize onle the last component if you are combining components
+                    for j in range(len(step)):
+                        step[j] = pre.MinMaxScaler().fit_transform(np.array(step[j]).reshape(-1, 1)).flatten()
+         
                 #we need to store the steps for each component
-                self.steps[col_name] = np.array(step)
+                self.steps[col_name] = step
         
         if combine_legs and not (len(self.steps.items())==0):
             min_stps = min([self.steps[key_].shape[0] for key_ in  self.steps.keys()])

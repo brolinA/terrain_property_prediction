@@ -74,6 +74,12 @@ class SVMClassification:
                             
                             if augmentation_type == 'wavelet':
                                 augmentation = self.wavelet_analysis.extract_details(signal, curr_augmentations[augmentation_type])
+                            elif augmentation_type == 'derivative':
+                                #only compute derivates for joint torques
+                                torque_list = ['hip', 'calf', 'tigh']
+                                for torque_val in torque_list:
+                                    if torque_val in leg_component:
+                                        augmentation = self.data_augmentation.augment_signal(signal, augmentation_type, curr_augmentations[augmentation_type])
                             else:
                                 augmentation = self.data_augmentation.augment_signal(signal, augmentation_type, curr_augmentations[augmentation_type])
 

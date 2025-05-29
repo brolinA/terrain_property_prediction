@@ -89,6 +89,9 @@ class DataAugmentation:
         #get the non-zero values and flatten it.
         return up_tri[np.nonzero(up_tri)]
     
+    def signal_derivate(self, signal):
+        return np.gradient(signal)
+    
     def augment_signal(self, signal, type, param):
         """Augment the signal based on the specified type and parameters."""
         if type == 'time_shift':
@@ -109,6 +112,8 @@ class DataAugmentation:
             return self.time_warp(signal, param)
         elif type == 'low_pass_filter' or type =='fft':
             return self.low_pass_filter(signal, param)
+        elif type == 'derivative':
+            return self.signal_derivate(signal)
         else:
             print(f"Unknown augmentation type. Given {type} but expected one of ['time_shift', 'time_scale',"
                               "'random_crop', 'pad_or_truncate', 'add_noise', 'amplitude_scale', 'signal_inversion',"
