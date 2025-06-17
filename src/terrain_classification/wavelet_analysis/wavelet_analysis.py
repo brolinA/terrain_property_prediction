@@ -57,7 +57,7 @@ class WaveletAnalysis:
 
             # Loop through the wavelet results and plot each one
             for i, scalogram_array in enumerate(wavelets):
-                extent = [0, len(self.input_signal) if self.input_signal is not None else 0, 1, scalogram_array.shape[0]]
+                extent = [0, len(self.input_signal[0]) if self.input_signal is not None else 0, 1, scalogram_array.shape[0]]
                 axes[i].imshow(scalogram_array, extent=extent, aspect='auto', cmap='jet', origin='lower')
                 axes[i].set_title(f"Segment {i + 1}")
                 axes[i].set_xlabel('Time')

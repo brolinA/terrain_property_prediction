@@ -36,7 +36,7 @@ class SVMClassification:
                                         augmetation_params={'wavelet': None}):
         """Load and preprocess the data."""
 
-        print(f"Applying the following augmentations: {augmetation_params}")
+        # print(f"Applying the following augmentations: {augmetation_params}")
         if len(augmetation_params) == 0 and not use_original_signal:
             print("No augmentation provided and original signal is not used. So cannot create feature matrix")
             return np.empty([])
@@ -61,10 +61,11 @@ class SVMClassification:
                         augmented_signal = np.hstack((augmented_signal, interleave_.flatten()))
                         self.original_data.append(augmented_signal) #save the original signal if required later
 
+                    #correlation is computed for the whole signal. So can't be run for individual leg data
                     if "correlation" in curr_augmentations:
                         correlation_ = self.data_augmentation.correlation_matrix(self.data_extractor.steps, leg_components, step_number )
                         augmented_signal = np.hstack((augmented_signal, correlation_.tolist()))
-                        del curr_augmentations['correlation'] #remove before proceeding
+                        del curr_augmentations['correlation'] #remove before proceeding so that this augmentation is not applied for the next step
 
                     #run though each leg components and compute the other augmentations.
                     for leg_component in leg_components: # for each component
@@ -74,12 +75,12 @@ class SVMClassification:
                             
                             if augmentation_type == 'wavelet':
                                 augmentation = self.wavelet_analysis.extract_details(signal, curr_augmentations[augmentation_type])
-                            elif augmentation_type == 'derivative':
-                                #only compute derivates for joint torques
-                                torque_list = ['hip', 'calf', 'tigh']
-                                for torque_val in torque_list:
-                                    if torque_val in leg_component:
-                                        augmentation = self.data_augmentation.augment_signal(signal, augmentation_type, curr_augmentations[augmentation_type])
+                            # elif augmentation_type == 'derivative':
+                            #     #only compute derivates for joint torques
+                            #     torque_list = ['hip', 'calf', 'tigh']
+                            #     for torque_val in torque_list:
+                            #         if torque_val in leg_component: #check if the word ['hip', 'calf', 'tigh'] appear in the list of compoenents
+                            #             augmentation = self.data_augmentation.augment_signal(signal, augmentation_type, curr_augmentations[augmentation_type])
                             else:
                                 augmentation = self.data_augmentation.augment_signal(signal, augmentation_type, curr_augmentations[augmentation_type])
 
@@ -137,7 +138,7 @@ class SVMClassification:
         if find_best_parameters:
             if verbose:
                 print("\nFinding best parameters...")
-            svc = svm.SVC(verbose=False)
+            svc = svm.SVC(verbose=False, class_weight='balanced', probability=True)
             param_grid = {
                 'C': C,          # Regularization parameter
                 'gamma': gamma,  # Kernel coefficient
@@ -158,18 +159,21 @@ class SVMClassification:
         else:
             print("\n[Training] Training SVM with fixed parameters...")
             svc = svm.SVC(C=C[0], gamma=gamma[0], kernel='rbf', class_weight='balanced', probability=True)
-            
+            X_train = self.feature_matrix
+            y_train = self.labels
+            scaler = StandardScaler()
+            X_train = scaler.fit_transform(X_train)
+            self.scaler = scaler # Save the scaler for later use
+
             svc.fit(X_train, y_train) # Train the SVM
             self.latest_model = svc # Save the model
-
-            y_pred = svc.predict(X_test) # Predict
 
             self.classification_report['C'] = C
             self.classification_report['gamma'] = gamma
 
         self.classification_report['report'] = classification_report(y_test, y_pred, output_dict=True)
         self.report = classification_report(y_test, y_pred, output_dict=False)
-        ConfusionMatrixDisplay.from_predictions(y_test, y_pred, display_labels=self.latest_model.classes_, cmap='Blues')
+        # ConfusionMatrixDisplay.from_predictions(y_test, y_pred, display_labels=self.latest_model.classes_, cmap='Blues')
         #saving report
         if save_report: #save report
             self.save_report(name=model_file_name, file_path=file_path)
