@@ -452,7 +452,7 @@
                                 <type>0</type>
                             </style>
                             <subscriber_queue_size>100</subscriber_queue_size>
-                            <title>gazebo</title>
+                            <title>z</title>
                         </curve_0>
                         <curve_1>
                             <axes>
@@ -834,7 +834,7 @@
                                 <type>0</type>
                             </style>
                             <subscriber_queue_size>100</subscriber_queue_size>
-                            <title>gazebo</title>
+                            <title>z</title>
                         </curve_0>
                         <curve_1>
                             <axes>
@@ -1214,7 +1214,7 @@
                                 <type>0</type>
                             </style>
                             <subscriber_queue_size>100</subscriber_queue_size>
-                            <title>gazebo</title>
+                            <title>z</title>
                         </curve_0>
                         <curve_1>
                             <axes>

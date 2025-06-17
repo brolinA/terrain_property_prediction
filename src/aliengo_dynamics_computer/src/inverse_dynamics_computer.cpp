@@ -97,7 +97,7 @@ void computeInverseDynamics::jointDataCallback(const sensor_msgs::JointState::Co
 		 !joint_data->position.empty() &&
 		 !joint_data->velocity.empty() &&
 		 !joint_data->effort.empty()){
-		joint_names_ = joint_data->name;
+		joint_state_effort_ = *joint_data; //store the joint state data for later use
 		robot_dynamic_data_.update(*joint_data, robot_model_);
 	}
 
@@ -287,18 +287,24 @@ void computeInverseDynamics::publishFootForce(Eigen::Vector4d foot_forces)
 
 void computeInverseDynamics::publishJointTorque()
 {
-	if(robot_dynamic_data_.dynamics_data_updated_){
+	// if(robot_dynamic_data_.dynamics_data_updated_){
+	// 	sensor_msgs::JointState joint_state;
+
+	// 	joint_state.header.stamp = ros::Time::now();
+	// 	joint_state.name = joint_names_;
+	// 	std::vector<float> effort_float = util_func_.eigenToStlVector(robot_dynamic_data_.joint_torque_);
+	// 	std::vector<double> joint_effort(effort_float.size());
+		
+	// 	//convert float datatype into double to be published in the topic
+	// 	std::transform(effort_float.begin(), effort_float.end(), joint_effort.begin(), 
+	// 		[](float f) { return static_cast<double>(f); });
+	// 	joint_state.effort = joint_effort;
+	// 	joint_torque_pub_.publish(joint_state);
+	// }
 		sensor_msgs::JointState joint_state;
 
 		joint_state.header.stamp = ros::Time::now();
-		joint_state.name = joint_names_;
-		std::vector<float> effort_float = util_func_.eigenToStlVector(robot_dynamic_data_.joint_torque_);
-		std::vector<double> joint_effort(effort_float.size());
-		
-		//convert float datatype into double to be published in the topic
-		std::transform(effort_float.begin(), effort_float.end(), joint_effort.begin(), 
-			[](float f) { return static_cast<double>(f); });
-		joint_state.effort = joint_effort;
+		joint_state.name = joint_state_effort_.name;
+		joint_state.effort = joint_state_effort_.effort; //use the stored joint state data from the callback
 		joint_torque_pub_.publish(joint_state);
-	}
 }

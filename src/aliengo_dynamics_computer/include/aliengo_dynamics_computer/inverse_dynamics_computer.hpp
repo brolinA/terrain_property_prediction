@@ -65,8 +65,6 @@ private:
 
     std::vector<std::string> contact_points_; //!< name of all the contact points for which we want to calculate force
 
-    std::vector<std::string> joint_names_; //!< to store the joint names
-
     std::vector<FrameIndex> contact_pt_ids_; //!< Id of the contact frames if they exist.
 
     bool odom_available_ = false; //!< Variable to indicate if the odom data has be received
@@ -158,6 +156,8 @@ private:
     std::vector<DataNormalizer> normalized_force_mangitude_; //!< vector to store the forces magnitudes for each leg
 
     std::vector<DataNormalizer> normalized_force_component_; //!< vector to store the forces components for each leg
+
+    sensor_msgs::JointState joint_state_effort_; //!< variable to store the joint state data
 
 
     //Function definitions
